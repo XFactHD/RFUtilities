@@ -1,0 +1,28 @@
+tile.rfutilities:blockSwitch.name=RF Switch
+tile.rfutilities:blockResistor.name=RF Resistor
+tile.rfutilities:blockCapacitor.name=RF Capacitor
+tile.rfutilities:blockInvisibleTesseract.name=Cloakable RF Tesseract
+tile.rfutilities:blockDiode.name=RF Diode
+tile.rfutilities:blockRFMeter.name=RF Meter
+tile.rfutilities:blockTransistor.name=RF Transistor
+
+item.rfutilities:itemMaterial.TessEmpty.name=Invisible Tesseract Frame (Empty)
+item.rfutilities:itemMaterial.TessFull.name=Invisible Tesseract Frame (Full)
+item.rfutilities:itemMaterial.Display.name=Display
+item.rfutilities:itemMaterial.HardenedGlassPane.name=Hardened Glass Pane
+item.rfutilities:itemDialer.name=Tesseract Dialer
+
+desc.rfutilities:through.name=Current throughput:
+desc.rfutilities:stored.name=Currently stored:
+desc.rfutilities:rftick.name=RF/t
+desc.rfutilities:rf.name=RF
+desc.rfutilities:capType.name=Capacitor Type:
+desc.rfutilities:capType_1.name=TE Flux Compensator
+desc.rfutilities:capType_2.name=TE Hardened Flux Compensator
+desc.rfutilities:capType_3.name=TE Reinforced Flux Compensator
+desc.rfutilities:capType_4.name=TE Resonant Flux Compensator
+desc.rfutilities:capType_5.name=EnderIO Basic Capacitor
+desc.rfutilities:capType_6.name=EnderIO Double-Layer Capacitor
+desc.rfutilities:capType_7.name=EnderIO Vibrant Capacitor
+
+itemGroup.rfutilities=RF Utilities

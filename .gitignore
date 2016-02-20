@@ -1,0 +1,17 @@
+*.class
+.mtj.tmp/
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws
+*.rtf
+CoFH_at.cfg
+out/*
+libs/*
+eclipse/*
+build/*
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
