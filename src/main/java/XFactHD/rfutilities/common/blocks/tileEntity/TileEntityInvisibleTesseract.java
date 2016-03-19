@@ -262,7 +262,7 @@ public class TileEntityInvisibleTesseract extends TileEntityBaseRFU implements I
     @Override
     public void readCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
-        LogHelper.info("Reading from NBT!");
+        //LogHelper.info("Reading from NBT!");
         hidden = nbt.getBoolean("hidden");
         isActive = nbt.getBoolean("isActive");
         isSender = nbt.getBoolean("isSender");
@@ -283,7 +283,7 @@ public class TileEntityInvisibleTesseract extends TileEntityBaseRFU implements I
     @Override
     public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
-        LogHelper.info("Writing to NBT!");
+        //LogHelper.info("Writing to NBT!");
         nbt.setBoolean("hidden", hidden);
         nbt.setBoolean("isActive", isActive);
         nbt.setBoolean("isSender", isSender);

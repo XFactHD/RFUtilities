@@ -19,6 +19,6 @@ public class ItemMaterialTess extends ItemBaseRFU
 {
         public ItemMaterialTess()
     {
-        super("itemMaterialTess", 64, "TessEmpty", "TessFull");
+        super("itemMaterialTess", 64, 1, "TessEmpty", "TessFull");
     }
 }

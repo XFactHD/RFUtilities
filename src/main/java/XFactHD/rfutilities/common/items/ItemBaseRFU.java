@@ -32,9 +32,9 @@ public class ItemBaseRFU extends Item
 {
     public String itemName;
     public String[] subNames;
-    public IIcon[] icons;
+    public IIcon[][] icons;
 
-    public ItemBaseRFU(String name, int stackSize, String... subNames)
+    public ItemBaseRFU(String name, int stackSize, int iconLength, String... subNames)
     {
         this.setUnlocalizedName(Reference.MOD_ID + ":" + name);
         this.setHasSubtypes(subNames != null && subNames.length > 0);
@@ -42,7 +42,7 @@ public class ItemBaseRFU extends Item
         this.setMaxStackSize(stackSize);
         this.itemName = name;
         this.subNames = subNames != null && subNames.length < 1 ? null : subNames;
-        this.icons = new IIcon[this.subNames != null ? this.subNames.length : 1];
+        this.icons = new IIcon[this.subNames != null ? this.subNames.length : 1][iconLength];
 
         GameRegistry.registerItem(this, name);
     }
@@ -60,12 +60,12 @@ public class ItemBaseRFU extends Item
         {
             for(int i=0;i<icons.length;i++)
             {
-                this.icons[i] = iconRegister.registerIcon(Reference.MOD_ID + ":" + itemName + "_" + getSubNames()[i]);
+                this.icons[i][0] = iconRegister.registerIcon(Reference.MOD_ID + ":" + itemName + "_" + getSubNames()[i]);
             }
         }
         else
         {
-            this.icons[0] = iconRegister.registerIcon(Reference.MOD_ID + ":" + itemName);
+            this.icons[0][0] = iconRegister.registerIcon(Reference.MOD_ID + ":" + itemName);
         }
     }
 
@@ -77,10 +77,10 @@ public class ItemBaseRFU extends Item
         {
             if(meta >= 0 && meta < icons.length)
             {
-                return this.icons[meta];
+                return this.icons[meta][0];
             }
         }
-        return icons[0];
+        return icons[0][0];
     }
 
     @Override

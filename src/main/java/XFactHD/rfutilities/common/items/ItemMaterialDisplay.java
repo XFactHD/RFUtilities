@@ -19,6 +19,6 @@ public class ItemMaterialDisplay extends ItemBaseRFU
 {
     public ItemMaterialDisplay()
     {
-        super("itemMaterialDisplay", 64, "Display");
+        super("itemMaterialDisplay", 64, 1, "Display");
     }
 }

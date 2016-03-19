@@ -19,6 +19,6 @@ public class ItemMaterial extends ItemBaseRFU
 {
     public ItemMaterial()
     {
-        super("itemMaterial", 64, "HardenedGlassPane");
+        super("itemMaterial", 64, 1,"HardenedGlassPane");
     }
 }

@@ -33,7 +33,7 @@ public class ItemDialer extends ItemBaseRFU
 {
     public ItemDialer()
     {
-        super("itemDialer", 1, "Dialer");
+        super("itemDialer", 1, 2, "Dialer");
     }
 
     @Override
@@ -85,8 +85,8 @@ public class ItemDialer extends ItemBaseRFU
     @Override
     public void registerIcons(IIconRegister iconRegister)
     {
-        icons[0] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Dial
-        icons[1] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Clear
+        icons[0][0] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Dial
+        icons[0][1] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Clear
     }
 
     @Override
@@ -94,11 +94,11 @@ public class ItemDialer extends ItemBaseRFU
     {
         if (stack.hasTagCompound())
         {
-            return stack.stackTagCompound.getBoolean("modeDial") ? icons[0] : icons[1];
+            return stack.stackTagCompound.getBoolean("modeDial") ? icons[0][0] : icons[0][1];
         }
         else
         {
-            return icons[0];
+            return icons[0][0];
         }
     }
 }
