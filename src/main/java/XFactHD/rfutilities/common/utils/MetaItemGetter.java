@@ -15,6 +15,7 @@
 
 package XFactHD.rfutilities.common.utils;
 
+import cofh.thermalexpansion.item.TEItems;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.Item;
@@ -23,22 +24,12 @@ import net.minecraftforge.oredict.OreDictionary;
 
 public class MetaItemGetter
 {
-    public static ItemStack ingotLead;
-    public static ItemStack ingotInvar;
-    public static ItemStack ingotElectrum;
-    public static ItemStack ingotEnderium;
-    public static ItemStack ingotBronze;
-    public static ItemStack ingotSilver;
-
-    public static ItemStack nuggetElectrum;
-    public static ItemStack nuggetEnderium;
-
-    public static ItemStack hardenedGlass;
-
     public static ItemStack ingotConductiveIron;
     public static ItemStack ingotEnergeticAlloy;
     public static ItemStack ingotVibrantAlloy;
     public static ItemStack ingotElectricalSteel;
+
+    public static ItemStack coil;
 
     public static ItemStack capTEBasic;
     public static ItemStack capTEHardened;
@@ -58,17 +49,7 @@ public class MetaItemGetter
             capTEReinforced = new ItemStack(capItemTE, 1, 4);
             capTEResonant = new ItemStack(capItemTE, 1, 5);
 
-            ingotLead = OreDictionary.getOres("ingotLead").get(0);
-            ingotInvar = OreDictionary.getOres("ingotInvar").get(0);
-            ingotElectrum = OreDictionary.getOres("ingotElectrum").get(0);
-            ingotEnderium = OreDictionary.getOres("ingotEnderium").get(0);
-            ingotBronze = OreDictionary.getOres("ingotBronze").get(0);
-            ingotSilver = OreDictionary.getOres("ingotSilver").get(0);
-
-            hardenedGlass = OreDictionary.getOres("blockGlassHardened").get(0);
-
-            nuggetElectrum = OreDictionary.getOres("nuggetElectrum").get(0);
-            nuggetEnderium = OreDictionary.getOres("nuggetEnderium").get(0);
+            coil = TEItems.powerCoilGold.copy();
         }
 
         if (Loader.isModLoaded("EnderIO"))

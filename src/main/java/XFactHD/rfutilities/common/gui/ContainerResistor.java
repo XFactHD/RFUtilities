@@ -30,6 +30,6 @@ public class ContainerResistor extends Container
     @Override
     public boolean canInteractWith(EntityPlayer player)
     {
-        return false;
+        return true;
     }
 }

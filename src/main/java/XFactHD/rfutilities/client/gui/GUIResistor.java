@@ -16,29 +16,33 @@
 package XFactHD.rfutilities.client.gui;
 
 import XFactHD.rfutilities.client.utils.ClientUtils;
-import XFactHD.rfutilities.common.gui.ContainerInvisTess;
+import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityResistor;
 import XFactHD.rfutilities.common.gui.ContainerResistor;
+import XFactHD.rfutilities.common.utils.LogHelper;
 import XFactHD.rfutilities.common.utils.Reference;
-import XFactHD.rfutilities.common.utils.Utils;
-import net.minecraft.client.gui.FontRenderer;
+import cofh.core.gui.GuiLimitedTextField;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StatCollector;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-
-import java.util.List;
 
 public class GUIResistor extends GuiContainer
 {
-    public int sH = Utils.screenHeight();
-    public int sW = Utils.screenWidth();
-    public int texXSize = 176;
-    public int texYSize = 166;
+    public EntityPlayer player;
+    public GuiTextField value;
+    public TileEntityResistor tile;
+    public boolean buttonAcceptEnabled = false;
 
-    public GUIResistor(InventoryPlayer inv, TileEntity te)
+    public GUIResistor(InventoryPlayer inv, TileEntityResistor te)
     {
         super(new ContainerResistor(inv, te));
+        player = inv.player;
+        this.tile = te;
     }
 
     @Override
@@ -52,31 +56,57 @@ public class GUIResistor extends GuiContainer
     {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
     }
+
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        ClientUtils.bindTexture(Reference.GUI_FOLDER + "guiResistor.png");
-        this.drawTexturedModalRect(guiLeft, guiTop + 35, 0, 0, texXSize, texYSize);
-        ClientUtils.bindTexture(Reference.GUI_FOLDER + "guiResistor.png");
-    }
-
-    @Override
-    protected void drawHoveringText(List strings, int x, int y, FontRenderer font)
-    {
-
+        ClientUtils.bindTexture(Reference.GUI_FOLDER + "GUI_Resistor.png");
+        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, 120, 100);
+        value.drawTextBox();
+        value.setText(value.getText());
+        drawString(fontRendererObj, "RF/t", guiLeft + 80, guiTop + 17, 16);
     }
 
     @Override
     public void initGui()
     {
         super.initGui();
+        Keyboard.enableRepeatEvents(true);
+        GuiButton accept = new GuiButton(0, guiLeft + 20, guiTop + 37, 80, 20, StatCollector.translateToLocal("guiDesc.rfutilities:accept.name"));
+        GuiButton decline = new GuiButton(1, guiLeft + 20, guiTop + 65, 80, 20, StatCollector.translateToLocal("guiDesc.rfutilities:decline.name"));
+        value = new GuiLimitedTextField(this.fontRendererObj, guiLeft + 15, guiTop + 14, 90, 14, "0123456789");
+        value.setCanLoseFocus(false);
+        value.setFocused(true);
+        value.setMaxStringLength(10);
+        value.setText(Integer.toString(tile.getThroughput()));
+        buttonAcceptEnabled = !Integer.toString(tile.getThroughput()).equals(value.getText());
+
+        this.buttonList.add(accept);
+        this.buttonList.add(decline);
     }
 
     @Override
     public void updateScreen()
     {
         super.updateScreen();
+        value.updateCursorCounter();
+        ((GuiButton)this.buttonList.get(0)).enabled = buttonAcceptEnabled;
+    }
+
+    public void updateButtonAccept()
+    {
+        buttonAcceptEnabled = !("".equals(value.getText())) && !Integer.toString(tile.getThroughput()).equals(value.getText());
+    }
+
+    @Override
+    protected void keyTyped(char par1, int par2)
+    {
+        super.keyTyped(par1, par2);
+        if(!(par2 == Keyboard.KEY_E))
+        {
+            this.value.textboxKeyTyped(par1, par2);
+            this.updateButtonAccept();
+        }
     }
 
     @Override
@@ -88,6 +118,30 @@ public class GUIResistor extends GuiContainer
     @Override
     protected void actionPerformed(GuiButton button)
     {
+        if (button.id == 1)
+        {
+            this.player.closeScreen();
+        }
+        else if (button.id == 0)
+        {
+            int throughput = 0;
+            if (value.getText().length() == 10 && Integer.parseInt(value.getText().substring(0, 8)) > 21474836)
+            {
+                throughput = Integer.MAX_VALUE;
+                value.setText(Integer.toString(Integer.MAX_VALUE));
+            }
+            else
+            {
+                throughput = Integer.parseInt(value.getText());
+            }
+            tile.setThroughput(throughput);
+            this.updateButtonAccept();
+        }
+    }
 
+    @Override
+    protected void mouseClicked(int x, int y, int key)
+    {
+        super.mouseClicked(x, y, key);
     }
 }

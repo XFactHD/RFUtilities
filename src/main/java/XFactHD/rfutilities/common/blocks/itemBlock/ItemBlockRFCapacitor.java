@@ -17,6 +17,7 @@ package XFactHD.rfutilities.common.blocks.itemBlock;
 
 import XFactHD.rfutilities.common.blocks.block.BlockRFCapacitor;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityCapacitor;
+import cpw.mods.fml.common.Loader;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -25,6 +26,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -84,13 +86,19 @@ public class ItemBlockRFCapacitor extends ItemBlock
         capEIODouble.setTagCompound(compoundCapEIODouble);
         capEIOVibrant.setTagCompound(compoundCapEIOVibrant);
 
-        list.add(capTEBasic);
-        list.add(capTEHardened);
-        list.add(capTEReinforced);
-        list.add(capTEResonant);
-        list.add(capEIOBasic);
-        list.add(capEIODouble);
-        list.add(capEIOVibrant);
+        if (Loader.isModLoaded("ThermalExpansion"))
+        {
+            list.add(capTEBasic);
+            list.add(capTEHardened);
+            list.add(capTEReinforced);
+            list.add(capTEResonant);
+        }
+        if (Loader.isModLoaded("EnderIO"))
+        {
+            list.add(capEIOBasic);
+            list.add(capEIODouble);
+            list.add(capEIOVibrant);
+        }
     }
 
     @Override
@@ -99,9 +107,29 @@ public class ItemBlockRFCapacitor extends ItemBlock
         if (stack.hasTagCompound() && stack.stackTagCompound.hasKey("type"))
         {
             int type = stack.stackTagCompound.getInteger("type");
-            String info = StatCollector.translateToLocal("desc.rfutilities:capType.name");
-            String typeName = StatCollector.translateToLocal("desc.rfutilities:capType_" + type + ".name");
-            list.add(info + " " + typeName);
+            if (type < 5 && !Loader.isModLoaded("ThermalExpansion"))
+            {
+                String warn = StatCollector.translateToLocal("desc.rfutilities:noDep.name");
+                list.add(EnumChatFormatting.RED + warn);
+            }
+            else if (type < 5)
+            {
+                String info = StatCollector.translateToLocal("desc.rfutilities:capType.name");
+                String typeName = StatCollector.translateToLocal("desc.rfutilities:capType_" + type + ".name");
+                list.add(info + " " + typeName);
+            }
+
+            if (type > 4 && !Loader.isModLoaded("EnderIO"))
+            {
+                String warn = StatCollector.translateToLocal("desc.rfutilities:noDep.name");
+                list.add(EnumChatFormatting.RED + warn);
+            }
+            else if (type > 4)
+            {
+                String info = StatCollector.translateToLocal("desc.rfutilities:capType.name");
+                String typeName = StatCollector.translateToLocal("desc.rfutilities:capType_" + type + ".name");
+                list.add(info + " " + typeName);
+            }
         }
         super.addInformation(stack, player, list, bool);
     }

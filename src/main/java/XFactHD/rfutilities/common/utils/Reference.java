@@ -19,12 +19,12 @@ public class Reference
 {
     public static final String MOD_ID = "rfutilities";
     public static final String MOD_NAME = "RFUtilities";
-    public static final String VERSION = "0.1";
+    public static final String VERSION = "0.3";
     public static final String SERVER_PROXY = "XFactHD.rfutilities.common.CommonProxy";
     public static final String CLIENT_PROXY = "XFactHD.rfutilities.client.ClientProxy";
+    public static final String DEPENDENCIES = "after:ThermalExpansion";
 
-    public static final int GUI_ID_TESS = 1;
-    public static final int GUI_ID_RES = 2;
+    public static final int GUI_ID_RES = 1;
 
     public static final String GUI_FOLDER = "rfutilities:textures/gui/";
 }

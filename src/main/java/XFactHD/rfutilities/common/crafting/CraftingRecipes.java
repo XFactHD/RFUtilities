@@ -26,6 +26,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class CraftingRecipes
 {
@@ -37,16 +38,18 @@ public class CraftingRecipes
     static ItemStack capEIODouble      = new ItemStack(RFUContent.blockCapacitor, 1);
     static ItemStack capEIOVibrant     = new ItemStack(RFUContent.blockCapacitor, 1);
 
+    static ItemStack dialer            = new ItemStack(RFUContent.itemDialer, 1);
+
     static ItemStack rfSwitch          = new ItemStack(RFUContent.blockSwitch);
     static ItemStack rfResistor        = new ItemStack(RFUContent.blockResistor);
     static ItemStack rfDiode           = new ItemStack(RFUContent.blockDiode);
     static ItemStack invisTess         = new ItemStack(RFUContent.blockInvisTess);
     static ItemStack rfMeter           = new ItemStack(RFUContent.blockRFMeter);
 
-    static ItemStack itemTessEmpty     = new ItemStack(RFUContent.itemMaterial, 1, 0);
-    static ItemStack itemTessFull      = new ItemStack(RFUContent.itemMaterial, 1, 1);
-    static ItemStack itemDisplay       = new ItemStack(RFUContent.itemMaterial, 1, 2);
-    static ItemStack hardenedGlassPane = new ItemStack(RFUContent.itemMaterial, 1, 3);
+    static ItemStack itemTessEmpty     = new ItemStack(RFUContent.itemMaterialTess, 1, 0);
+    static ItemStack itemTessFull      = new ItemStack(RFUContent.itemMaterialTess, 1, 1);
+    static ItemStack itemDisplay       = new ItemStack(RFUContent.itemMaterialDisplay, 1, 0);
+    static ItemStack hardenedGlassPane = new ItemStack(RFUContent.itemMaterial, 1, 0);
 
     static ItemStack stoneSlab         = new ItemStack(Blocks.stone_slab, 1, 0);
     static ItemStack coal              = new ItemStack(Items.coal, 1, 0);
@@ -86,26 +89,23 @@ public class CraftingRecipes
         capEIODouble.setTagCompound(compoundCapEIODouble);
         capEIOVibrant.setTagCompound(compoundCapEIOVibrant);
 
-        GameRegistry.addShapedRecipe(rfDiode,       "   ", "EQE", "SSS", 'E', MetaItemGetter.ingotElectrum, 'Q', netherQuartz, 'S', stoneSlab);
-        GameRegistry.addShapedRecipe(rfResistor,    "   ", "ECE", "SSS", 'E', MetaItemGetter.ingotElectrum, 'C', coal, 'S', stoneSlab);
-        GameRegistry.addShapedRecipe(rfSwitch,      " L ", "ERE", "SSS", 'E', MetaItemGetter.ingotElectrum, 'L', lever, 'R', redstone, 'S', stoneSlab);
-        GameRegistry.addShapedRecipe(itemDisplay,   "III", "IGI", "EEE", 'I', ingotIron, 'G', glassPane, 'E', MetaItemGetter.nuggetElectrum);
-        GameRegistry.addShapedRecipe(rfMeter,       " D ", "ERE", "SSS", 'D', itemDisplay, 'E', MetaItemGetter.ingotElectrum, 'R', repeater, 'S', stoneSlab);
-        GameRegistry.addShapedRecipe(hardenedGlassPane, "GGG", "GGG", "   ", 'G', MetaItemGetter.hardenedGlass);
-        GameRegistry.addShapedRecipe(itemTessEmpty, "EGE", "GDG", "EGE", 'E', MetaItemGetter.nuggetEnderium, 'G', hardenedGlassPane, 'D', diamond);
-        GameRegistry.addShapedRecipe(invisTess,     "BSB", "STS", "BSB", 'B', MetaItemGetter.ingotBronze, 'S', MetaItemGetter.ingotSilver, 'T', itemTessFull);
+        GameRegistry.addRecipe(new ShapedOreRecipe(rfDiode,           "   ", "EQE", "SSS", 'E', "ingotElectrum", 'Q', netherQuartz, 'S', stoneSlab));
+        GameRegistry.addRecipe(new ShapedOreRecipe(rfResistor,        "   ", "ECE", "SSS", 'E', "ingotElectrum", 'C', coal, 'S', stoneSlab));
+        GameRegistry.addRecipe(new ShapedOreRecipe(rfSwitch,          " L ", "ERE", "SSS", 'E', "ingotElectrum", 'L', lever, 'R', redstone, 'S', stoneSlab));
+        GameRegistry.addRecipe(new ShapedOreRecipe(itemDisplay,       "III", "IGI", "EEE", 'I', ingotIron, 'G', glassPane, 'E', "nuggetElectrum"));
+        GameRegistry.addRecipe(new ShapedOreRecipe(rfMeter,           " D ", "ERE", "SSS", 'D', itemDisplay, 'E', "ingotElectrum", 'R', repeater, 'S', stoneSlab));
 
         if (Loader.isModLoaded("ThermalExpansion"))
         {
-            GameRegistry.addShapedRecipe(capTEBasic,      " C ", "ELE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEBasic, 'E', MetaItemGetter.ingotElectrum, 'L', MetaItemGetter.ingotLead);
-            GameRegistry.addShapedRecipe(capTEHardened,   " C ", "EIE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEHardened, 'E', MetaItemGetter.ingotElectrum, 'I', MetaItemGetter.ingotInvar);
-            GameRegistry.addShapedRecipe(capTEReinforced, " C ", "EEE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEReinforced, 'E', MetaItemGetter.ingotElectrum);
-            GameRegistry.addShapedRecipe(capTEResonant,   " C ", "ERE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEResonant, 'E', MetaItemGetter.ingotElectrum, 'R', MetaItemGetter.ingotEnderium);
+            GameRegistry.addRecipe(new ShapedOreRecipe(capTEBasic,      " C ", "ELE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEBasic, 'E', "ingotElectrum", 'L', "ingotLead"));
+            GameRegistry.addRecipe(new ShapedOreRecipe(capTEHardened,   " C ", "EIE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEHardened, 'E', "ingotElectrum", 'I', "ingotInvar"));
+            GameRegistry.addRecipe(new ShapedOreRecipe(capTEReinforced, " C ", "EEE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEReinforced, 'E', "ingotElectrum"));
+            GameRegistry.addRecipe(new ShapedOreRecipe(capTEResonant,   " C ", "ERE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEResonant, 'E', "ingotElectrum", 'R', "ingotEnderium"));
+            GameRegistry.addRecipe(new ShapedOreRecipe(hardenedGlassPane, "GGG", "GGG", "   ", 'G', "blockGlassHardened"));
+            GameRegistry.addRecipe(new ShapedOreRecipe(itemTessEmpty,     "EGE", "GDG", "EGE", 'E', "nuggetEnderium", 'G', hardenedGlassPane, 'D', diamond));
+            GameRegistry.addRecipe(new ShapedOreRecipe(invisTess,         "BSB", "STS", "BSB", 'B', "ingotBronze", 'S', "ingotSilver", 'T', itemTessFull));
+            GameRegistry.addRecipe(new ShapedOreRecipe(dialer,            " C ", "RBR", "III", 'C', MetaItemGetter.coil, 'R', redstone, 'B', Blocks.stone_button, 'I', ingotIron));
             ThermalExpansionHelper.addTransposerFill(16000, itemTessEmpty, itemTessFull, fluidEnder, false);
-        }
-        else
-        {
-            GameRegistry.addShapedRecipe(itemTessFull,  " P ", "PTP", " P ", 'P', Items.ender_pearl, 'T', itemTessEmpty);
         }
 
         if (Loader.isModLoaded("EnderIO"))

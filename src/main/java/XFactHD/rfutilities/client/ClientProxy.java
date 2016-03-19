@@ -15,15 +15,21 @@
 
 package XFactHD.rfutilities.client;
 
+import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.client.render.block.*;
 import XFactHD.rfutilities.client.render.item.*;
+import XFactHD.rfutilities.client.utils.KeyBindings;
+import XFactHD.rfutilities.client.utils.KeyInputHandler;
 import XFactHD.rfutilities.common.CommonProxy;
 import XFactHD.rfutilities.common.RFUContent;
 import XFactHD.rfutilities.common.blocks.tileEntity.*;
+import XFactHD.rfutilities.common.net.PacketGetThroughput;
 import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.MinecraftForgeClient;
 
@@ -33,6 +39,7 @@ public class ClientProxy extends CommonProxy
     public void preInit(FMLPreInitializationEvent event)
     {
         super.preInit(event);
+        RFUtilities.RFU_NET_WRAPPER.registerMessage(PacketGetThroughput.HandlerPacketGetThroughput.class, PacketGetThroughput.class, 1, Side.CLIENT);
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityInvisibleTesseract.class, new RenderInvisTesseract());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCapacitor.class, new RenderCapacitor());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySwitch.class, new RenderSwitch());
@@ -51,7 +58,10 @@ public class ClientProxy extends CommonProxy
         MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(RFUContent.blockSwitch), new ItemRendererSwitch());
         MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(RFUContent.blockInvisTess), new ItemRendererInvisTess());
         MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(RFUContent.blockRFMeter), new ItemRendererRFMeter());
-        MinecraftForgeClient.registerItemRenderer(RFUContent.itemMaterial, new ItemRendererMaterial());
+        MinecraftForgeClient.registerItemRenderer(RFUContent.itemMaterialTess, new ItemRendererMaterialTess());
+        MinecraftForgeClient.registerItemRenderer(RFUContent.itemMaterialDisplay, new ItemRendererMaterialDisplay());
+        FMLCommonHandler.instance().bus().register(new KeyInputHandler());
+        KeyBindings.init();
     }
 
     @Override

@@ -20,6 +20,7 @@ import XFactHD.rfutilities.common.blocks.tileEntity.*;
 import XFactHD.rfutilities.common.crafting.CraftingRecipes;
 import XFactHD.rfutilities.common.items.*;
 import XFactHD.rfutilities.common.utils.MetaItemGetter;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class RFUContent
@@ -32,15 +33,15 @@ public class RFUContent
     public static BlockBaseRFU blockRFMeter;
     public static BlockBaseRFU blockTransistor;
 
+    public static ItemBaseRFU itemMaterialTess;
+    public static ItemBaseRFU itemMaterialDisplay;
     public static ItemBaseRFU itemMaterial;
     public static ItemBaseRFU itemDialer;
 
     public static void preInit()
     {
-        itemMaterial = new ItemMaterial();
-        itemDialer = new ItemDialer();
+        itemMaterialDisplay = new ItemMaterialDisplay();
 
-        blockInvisTess = new BlockInvisibleTesseract();
         blockCapacitor = new BlockRFCapacitor();
         blockSwitch = new BlockRFSwitch();
         blockResistor = new BlockRFResistor();
@@ -48,14 +49,21 @@ public class RFUContent
         blockRFMeter = new BlockRFMeter();
         //blockTransistor = new BlockTransistor();
 
-
-        GameRegistry.registerTileEntity(TileEntityInvisibleTesseract.class, "tileInvisTess");
         GameRegistry.registerTileEntity(TileEntityCapacitor.class, "tileCapacitor");
         GameRegistry.registerTileEntity(TileEntitySwitch.class, "tileSwitch");
         GameRegistry.registerTileEntity(TileEntityResistor.class, "tileResistor");
         GameRegistry.registerTileEntity(TileEntityDiode.class, "tileDiode");
         GameRegistry.registerTileEntity(TileEntityRFMeter.class, "tileRFMeter");
         //GameRegistry.registerTileEntity(TileEntityTransistor.class, "tileTransistor");
+
+        if (Loader.isModLoaded("ThermalExpansion"))
+        {
+            itemDialer = new ItemDialer();
+            itemMaterial = new ItemMaterial();
+            itemMaterialTess = new ItemMaterialTess();
+            blockInvisTess = new BlockInvisibleTesseract();
+            GameRegistry.registerTileEntity(TileEntityInvisibleTesseract.class, "tileInvisTess");
+        }
     }
 
     public static void init()

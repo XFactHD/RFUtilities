@@ -6,37 +6,42 @@
  MCP Data version : unknown
 ****************************
 Found AccessTransformer in main resources: CoFH_at.cfg
+:extractMcpData UP-TO-DATE
+:getVersionJson
+:extractUserDev
+:genSrgs SKIPPED
+:extractNatives UP-TO-DATE
+:getAssetsIndex
+:getAssets
+:makeStart
+[ant:javac] warning: [options] bootstrap class path not set in conjunction with -source 1.6
+[ant:javac] 1 warning
+:downloadMcpTools SKIPPED
 :downloadClient SKIPPED
 :downloadServer SKIPPED
-:getVersionJson
-:extractUserDev UP-TO-DATE
 :mergeJars SKIPPED
-:applyBinPatches SKIPPED
-:downloadMcpTools SKIPPED
-:extractMcpData UP-TO-DATE
-:genSrgs SKIPPED
-:deobfBinJar UP-TO-DATE
-:compileApiJava UP-TO-DATE
-:processApiResources UP-TO-DATE
-:apiClasses UP-TO-DATE
-:sourceMainJava
-:compileJavawarning: [options] bootstrap class path not set in conjunction with -source 1.6
+:deobfuscateJar
+Applying SpecialSource...
+Applying Exceptor...
+:decompile
+:processSources
+Injecting fml files
+Applying fml patches
+Applying forge patches
+:remapJar
+:extractMinecraftSrc
+:recompMinecraftNote: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
-1 warning
 
-:processResources
-:classes
-:jar
-:compileTestJava UP-TO-DATE
-:processTestResources UP-TO-DATE
-:testClasses UP-TO-DATE
-:test UP-TO-DATE
-:reobf
-:assemble
-:check UP-TO-DATE
-:build
+:repackMinecraft
+:setupDecompWorkspace
+:ideaModule
+:ideaProject
+:ideaWorkspace
+:idea
 
 BUILD SUCCESSFUL
 
-Total time: 9.674 secs
+Total time: 4 mins 54.248 secs

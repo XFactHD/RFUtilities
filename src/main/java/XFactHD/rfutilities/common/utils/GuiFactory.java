@@ -15,11 +15,9 @@
 
 package XFactHD.rfutilities.common.utils;
 
-import XFactHD.rfutilities.client.gui.GUIInvisTess;
 import XFactHD.rfutilities.client.gui.GUIResistor;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityInvisibleTesseract;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityResistor;
-import XFactHD.rfutilities.common.gui.ContainerInvisTess;
 import XFactHD.rfutilities.common.gui.ContainerResistor;
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,11 +30,7 @@ public class GuiFactory implements IGuiHandler
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
     {
         TileEntity te = world.getTileEntity(x, y, z);
-        if (ID == 1 && te instanceof TileEntityInvisibleTesseract)
-        {
-            return new ContainerInvisTess(player.inventory, (TileEntityInvisibleTesseract)te);
-        }
-        if (ID == 2 && te instanceof TileEntityResistor)
+        if (ID == Reference.GUI_ID_RES && te instanceof TileEntityResistor)
         {
             return new ContainerResistor(player.inventory, (TileEntityResistor)te);
         }
@@ -47,11 +41,7 @@ public class GuiFactory implements IGuiHandler
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
     {
         TileEntity te = world.getTileEntity(x, y, z);
-        if (ID == 1 && te instanceof TileEntityInvisibleTesseract)
-        {
-            return new GUIInvisTess(player.inventory, (TileEntityInvisibleTesseract)te);
-        }
-        if (ID == 2 && te instanceof TileEntityResistor)
+        if (ID == Reference.GUI_ID_RES && te instanceof TileEntityResistor)
         {
             return new GUIResistor(player.inventory, (TileEntityResistor)te);
         }

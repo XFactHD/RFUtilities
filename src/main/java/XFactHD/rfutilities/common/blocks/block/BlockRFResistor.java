@@ -17,6 +17,7 @@ package XFactHD.rfutilities.common.blocks.block;
 
 import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityResistor;
+import XFactHD.rfutilities.common.utils.LogHelper;
 import XFactHD.rfutilities.common.utils.Reference;
 import cofh.thermalexpansion.item.tool.ItemMultimeter;
 import net.minecraft.block.material.Material;
@@ -75,8 +76,15 @@ public class BlockRFResistor extends BlockBaseRFU
             player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("desc.rfutilities:through.name") + " " + ((TileEntityResistor)te).throughput + " " + StatCollector.translateToLocal("desc.rfutilities:rftick.name")));
             return true;
         }
-        //player.openGui(RFUtilities.instance, Reference.GUI_ID_RES, world, x, y, z);
-        return false;
+        else
+        {
+            if (!world.isRemote)
+            {
+                player.openGui(RFUtilities.instance, Reference.GUI_ID_RES, world, x, y, z);
+            }
+
+        }
+        return true;
     }
 
     @Override
@@ -97,6 +105,7 @@ public class BlockRFResistor extends BlockBaseRFU
         return false;
     }
 
+    @Override
     public boolean renderAsNormalBlock()
     {
         return false;

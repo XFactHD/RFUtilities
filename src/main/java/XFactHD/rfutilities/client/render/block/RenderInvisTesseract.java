@@ -42,7 +42,18 @@ public class RenderInvisTesseract extends TileEntitySpecialRenderer
     {
         int meta = world.getBlockMetadata(x, y, z);
         GL11.glPushMatrix();
-        GL11.glRotatef(meta * (-90), 0.0F, 0.0F, 1.0F);
+        if (meta == 0)
+        {
+            GL11.glRotatef(90, 0.0F, 1.0F, 0.0F);
+        }
+        else if (meta == 1)
+        {
+            GL11.glRotatef(-90, 0.0F, 1.0F, 0.0F);
+        }
+        else
+        {
+            GL11.glRotatef(meta * (-90), 0.0F, 0.0F, 1.0F);
+        }
         GL11.glPopMatrix();
     }
 
@@ -52,9 +63,9 @@ public class RenderInvisTesseract extends TileEntitySpecialRenderer
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x + 0.5F, (float) y + 1.5F, (float) z + 0.5F);
 
-        if ((Minecraft.getMinecraft().thePlayer.getCurrentEquippedItem() != null && Minecraft.getMinecraft().thePlayer.getCurrentEquippedItem().getItem() instanceof ItemWrench) || !((TileEntityInvisibleTesseract)te).blur)
+        if ((Minecraft.getMinecraft().thePlayer.getCurrentEquippedItem() != null && Minecraft.getMinecraft().thePlayer.getCurrentEquippedItem().getItem() instanceof ItemWrench) || !((TileEntityInvisibleTesseract)te).hidden)
         {
-            final ResourceLocation textureLocation = new ResourceLocation(Reference.MOD_ID.toLowerCase(), "textures/models/modelInvisTess" + (((TileEntityInvisibleTesseract)te).active ? "_On" : "_Off") + ".png");
+            final ResourceLocation textureLocation = new ResourceLocation(Reference.MOD_ID.toLowerCase(), "textures/models/modelInvisTess" + (((TileEntityInvisibleTesseract)te).isActive ? "_On" : "_Off") + ".png");
             bindTexture(textureLocation);
         }
         else
@@ -67,13 +78,18 @@ public class RenderInvisTesseract extends TileEntitySpecialRenderer
         GL11.glRotatef(180F, 0.0F, 0.0F, 1.0F);
 
         int rotation = 0;
-        switch (te.getBlockMetadata() % 4)
+        //LogHelper.info(te.getBlockMetadata() + " " + te.getBlockMetadata() % 4);
+        switch (te.getBlockMetadata())
         {
             case 0:
-                rotation = 270;
+                rotation = 0;
+                GL11.glRotatef(-90, 1.0F, 0.0F, 0.0F);
+                GL11.glTranslatef(0F, -1F, 1F);
                 break;
             case 1:
                 rotation = 0;
+                GL11.glRotatef(90, 1.0F, 0.0F, 0.0F);
+                GL11.glTranslatef(0F, -1F, -1F);
                 break;
             case 2:
                 rotation = 90;
@@ -81,11 +97,17 @@ public class RenderInvisTesseract extends TileEntitySpecialRenderer
             case 3:
                 rotation = 180;
                 break;
+            case 4:
+                rotation = 270;
+                break;
+            case 5:
+                rotation = 0;
+                break;
         }
 
         GL11.glRotatef(rotation, 0.0F, 1.0F, 0.0F);
 
-        this.model.render(null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+        this.model.render(null, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F, false, ((TileEntityInvisibleTesseract)te).isSender);
 
         GL11.glPopMatrix();
         GL11.glPopMatrix();

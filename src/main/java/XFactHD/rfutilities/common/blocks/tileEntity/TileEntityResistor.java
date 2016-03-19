@@ -15,14 +15,20 @@
 
 package XFactHD.rfutilities.common.blocks.tileEntity;
 
+import XFactHD.rfutilities.RFUtilities;
+import XFactHD.rfutilities.common.net.PacketGetThroughput;
+import XFactHD.rfutilities.common.net.PacketSetThroughput;
+import XFactHD.rfutilities.common.net.PacketWantThroughput;
 import cofh.api.energy.IEnergyHandler;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityResistor extends TileEntityBaseRFU implements IEnergyHandler
 {
-    public int throughput = 1000;
+    public int throughput = 0;
 
     @Override
     public boolean canConnectEnergy(ForgeDirection fd)
@@ -107,6 +113,38 @@ public class TileEntityResistor extends TileEntityBaseRFU implements IEnergyHand
             }
         }
         return 0;
+    }
+
+    public void setThroughput(int value)
+    {
+        if (worldObj.isRemote)
+        {
+            RFUtilities.RFU_NET_WRAPPER.sendToServer(new PacketSetThroughput(xCoord, yCoord, zCoord, value));
+            throughput = value;
+        }
+        else
+        {
+            throughput = value;
+        }
+        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+    }
+
+    public void sendThroughputToClient(EntityPlayer player)
+    {
+        RFUtilities.RFU_NET_WRAPPER.sendTo(new PacketGetThroughput(xCoord, yCoord, zCoord, throughput), ((EntityPlayerMP)player));
+    }
+
+    public int getThroughput()
+    {
+        if (worldObj.isRemote)
+        {
+            RFUtilities.RFU_NET_WRAPPER.sendToServer(new PacketWantThroughput(xCoord, yCoord, zCoord, true));
+            return throughput;
+        }
+        else
+        {
+            return throughput;
+        }
     }
 
     @Override

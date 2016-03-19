@@ -40,7 +40,7 @@ public class ItemRendererInvisTess implements IItemRenderer
                 GL11.glRotatef(-90F, 0F, 1F, 0F);
                 GL11.glTranslatef(3F, -5.5F, 0F);
                 Minecraft.getMinecraft().renderEngine.bindTexture(texture);
-                model.render(null, -0.5F, -0.5F, -0.5F, 0.5F, 0.5F, 0.5F);
+                model.render(null, -0.5F, -0.5F, -0.5F, 0.5F, 0.5F, 0.5F, true, false);
                 GL11.glPopMatrix();
                 break;
             case EQUIPPED_FIRST_PERSON:
@@ -50,7 +50,7 @@ public class ItemRendererInvisTess implements IItemRenderer
                 GL11.glRotatef(-180F, 0F, 0F, 1F);
                 GL11.glTranslatef(3F, -10F, 10F);
                 Minecraft.getMinecraft().renderEngine.bindTexture(texture);
-                model.render(null, -0.5F, -0.5F, -0.5F, 0.5F, 0.5F, 0.5F);
+                model.render(null, -0.5F, -0.5F, -0.5F, 0.5F, 0.5F, 0.5F, true, false);
                 GL11.glPopMatrix();
                 break;
             case EQUIPPED:
@@ -64,7 +64,7 @@ public class ItemRendererInvisTess implements IItemRenderer
                 GL11.glRotatef(45F, 0F, 1F, 0F);
                 GL11.glTranslatef(3F, -8F, -3.3F);
                 Minecraft.getMinecraft().renderEngine.bindTexture(texture);
-                model.render(null, -0.5F, -0.5F, -0.5F, 0.5F, 0.5F, 0.5F);
+                model.render(null, -0.5F, -0.5F, -0.5F, 0.5F, 0.5F, 0.5F, true, false);
                 GL11.glPopMatrix();
                 break;
             case ENTITY:
@@ -73,7 +73,7 @@ public class ItemRendererInvisTess implements IItemRenderer
                 GL11.glScalef(0.5F, 0.5F, 0.5F);
                 GL11.glTranslatef(0F, -12F, -3F);
                 Minecraft.getMinecraft().renderEngine.bindTexture(texture);
-                model.render(null, -0.5F, -0.5F, -0.5F, 0.5F, 0.5F, 0.5F);
+                model.render(null, -0.5F, -0.5F, -0.5F, 0.5F, 0.5F, 0.5F, true, false);
                 GL11.glPopMatrix();
                 break;
         }

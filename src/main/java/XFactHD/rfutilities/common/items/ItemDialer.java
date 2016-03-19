@@ -15,10 +15,90 @@
 
 package XFactHD.rfutilities.common.items;
 
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.StatCollector;
+import net.minecraft.world.World;
+
+import java.util.List;
+
 public class ItemDialer extends ItemBaseRFU
 {
     public ItemDialer()
     {
-        super("itemDialer", 1);
+        super("itemDialer", 1, "Dialer");
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b)
+    {
+        if (stack.hasTagCompound())
+        {
+            String mode = stack.stackTagCompound.getBoolean("modeDial") ? StatCollector.translateToLocal("desc.rfutilities:modeDial.name") : StatCollector.translateToLocal("desc.rfutilities:modeClear.name");
+            list.add(mode);
+
+            if (stack.stackTagCompound.hasKey("senderX"))
+            {
+                int x = stack.getTagCompound().getInteger("senderX");
+                int y = stack.getTagCompound().getInteger("senderY");
+                int z = stack.getTagCompound().getInteger("senderZ");
+                String dialed = StatCollector.translateToLocal("desc.rfutilities:dialedTo.name") + " " + StatCollector.translateToLocal("desc.rfutilities:tessAt.name") + " X=" + x + ", Y=" + y + ", Z=" + z + ".";
+                list.add(EnumChatFormatting.GREEN + dialed);
+            }
+            else
+            {
+                String notDialed = EnumChatFormatting.RED + StatCollector.translateToLocal("desc.rfutilities:dialedTo.name") + " " + StatCollector.translateToLocal("desc.rfutilities:nothing.name");
+                list.add(EnumChatFormatting.RED + notDialed);
+            }
+        }
+        super.addInformation(stack, player, list, b);
+    }
+
+    @Override
+    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player)
+    {
+        if (!world.isRemote && player.isSneaking() && stack.stackTagCompound.getBoolean("modeDial"))
+        {
+            stack.setTagCompound(null);
+            player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:clearedDialer.name")));
+        }
+        return stack;
+    }
+
+    @Override
+    public void getSubItems(Item item, CreativeTabs tab, List list)
+    {
+        ItemStack stack = new ItemStack(item, 1, 0);
+        NBTTagCompound compound = new NBTTagCompound();
+        compound.setBoolean("modeDial", true);
+        stack.setTagCompound(compound);
+        list.add(stack);
+    }
+
+    @Override
+    public void registerIcons(IIconRegister iconRegister)
+    {
+        icons[0] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Dial
+        icons[1] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Clear
+    }
+
+    @Override
+    public IIcon getIcon(ItemStack stack, int pass)
+    {
+        if (stack.hasTagCompound())
+        {
+            return stack.stackTagCompound.getBoolean("modeDial") ? icons[0] : icons[1];
+        }
+        else
+        {
+            return icons[0];
+        }
     }
 }

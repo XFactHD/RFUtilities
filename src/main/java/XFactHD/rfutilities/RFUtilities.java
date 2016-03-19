@@ -17,6 +17,9 @@ package XFactHD.rfutilities;
 
 import XFactHD.rfutilities.common.CommonProxy;
 import XFactHD.rfutilities.common.RFUContent;
+import XFactHD.rfutilities.common.net.PacketGetThroughput;
+import XFactHD.rfutilities.common.net.PacketSetThroughput;
+import XFactHD.rfutilities.common.net.PacketWantThroughput;
 import XFactHD.rfutilities.common.utils.LogHelper;
 import XFactHD.rfutilities.common.utils.Reference;
 import cpw.mods.fml.common.Loader;
@@ -25,14 +28,20 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION)
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = Reference.DEPENDENCIES)
 public class RFUtilities
 {
+    public static SimpleNetworkWrapper RFU_NET_WRAPPER;
+    public static boolean TE_LOADED = false;
+
     @Mod.Instance(Reference.MOD_ID)
     public static RFUtilities instance;
 
@@ -43,6 +52,8 @@ public class RFUtilities
     public void preInit(FMLPreInitializationEvent event)
     {
         LogHelper.info("Hello Minecraft!");
+        TE_LOADED = Loader.isModLoaded("ThermalExpansion");
+        RFU_NET_WRAPPER = NetworkRegistry.INSTANCE.newSimpleChannel("rfu");
         proxy.preInit(event);
         LogHelper.info("PreInit complete");
     }

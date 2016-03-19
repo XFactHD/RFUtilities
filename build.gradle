@@ -17,12 +17,12 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "0.0.1.1" //Don't forget the Reference class!!!
-group= "XFactHD.thermalreactors" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "thermalreactors"
+version = "MC1.7.10-0.2" //Don't forget the Reference class!!!
+group= "XFactHD.rfutilities" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "RFUtilities"
 
 minecraft {
-    version = "1.7.10-10.13.4.1448-1.7.10"
+    version = "1.7.10-10.13.4.1614-1.7.10"
     runDir = "eclipse"
 }
 

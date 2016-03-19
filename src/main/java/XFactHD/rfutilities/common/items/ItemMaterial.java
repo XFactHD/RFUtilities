@@ -17,8 +17,8 @@ package XFactHD.rfutilities.common.items;
 
 public class ItemMaterial extends ItemBaseRFU
 {
-        public ItemMaterial()
+    public ItemMaterial()
     {
-        super("itemMaterial", 64, "TessEmpty", "TessFull", "Display", "HardenedGlassPane");
+        super("itemMaterial", 64, "HardenedGlassPane");
     }
 }

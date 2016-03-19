@@ -15,6 +15,9 @@
 
 package XFactHD.rfutilities.common.utils;
 
+import XFactHD.rfutilities.RFUtilities;
+import XFactHD.rfutilities.common.items.ItemDialer;
+import cofh.thermalexpansion.item.tool.ItemMultimeter;
 import cofh.thermalexpansion.item.tool.ItemToolBase;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,7 +25,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 
 public class EventHandler
 {
-    public static boolean isWrench = false;
+    public static boolean canItemShowTess = false;
 
     @SubscribeEvent
     public void entityEvent(LivingEvent.LivingUpdateEvent event)
@@ -31,12 +34,14 @@ public class EventHandler
         {
             if (((EntityPlayer) event.entity).getCurrentEquippedItem() != null)
             {
-                isWrench = (((EntityPlayer) event.entity).getCurrentEquippedItem().getItem() instanceof ItemToolBase);
-                //LogHelper.info(isWrench);
+                canItemShowTess =
+                        (RFUtilities.TE_LOADED && (((EntityPlayer) event.entity).getCurrentEquippedItem().getItem() instanceof ItemToolBase ||
+                        ((EntityPlayer) event.entity).getCurrentEquippedItem().getItem() instanceof ItemMultimeter)) ||
+                        ((EntityPlayer) event.entity).getCurrentEquippedItem().getItem() instanceof ItemDialer;
             }
             else
             {
-                isWrench = false;
+                canItemShowTess = false;
             }
         }
     }
