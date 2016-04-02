@@ -196,7 +196,7 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
     @Override
     public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z)
     {
-        if (EventHandler.canItemShowTess || (world.getTileEntity(x, y, z) != null  && !((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z)).hidden))
+        if (EventHandler.canItemShowTess || (world.getTileEntity(x, y, z) instanceof TileEntityInvisibleTesseract  && !((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z)).hidden))
         {
             switch (world.getBlockMetadata(x, y, z))
             {
@@ -218,7 +218,7 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z)
     {
-        if (EventHandler.canItemShowTess || (world.getTileEntity(x, y, z) != null  && !((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z)).hidden))
+        if (EventHandler.canItemShowTess || (world.getTileEntity(x, y, z) instanceof TileEntityInvisibleTesseract  && !((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z)).hidden))
         {
             switch (world.getBlockMetadata(x, y, z))
             {
@@ -250,6 +250,12 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
             case 5: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y+.13D, (double)z+.8D, (double)x+.87D, (double)y+.87D, (double)z+1);
             default: return AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)x+1, (double)y+1, (double)z+1);
         }
+    }
+
+    @Override
+    public MovingObjectPosition collisionRayTrace(World world, int x, int y, int z, Vec3 startVec, Vec3 endVec)
+    {
+        return super.collisionRayTrace(world, x, y, z, startVec, endVec);
     }
 
     @Override

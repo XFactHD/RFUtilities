@@ -17,7 +17,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "MC1.7.10-0.3-hotfix" //Don't forget the Reference class!!!
+version = "MC1.7.10-0.3-hotfix2" //Don't forget the Reference class!!!
 group= "XFactHD.rfutilities" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "RFUtilities"
 
