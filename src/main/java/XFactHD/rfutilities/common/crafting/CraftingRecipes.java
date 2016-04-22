@@ -30,46 +30,46 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class CraftingRecipes
 {
-    static ItemStack capTEBasic        = new ItemStack(RFUContent.blockCapacitor, 1);
-    static ItemStack capTEHardened     = new ItemStack(RFUContent.blockCapacitor, 1);
-    static ItemStack capTEReinforced   = new ItemStack(RFUContent.blockCapacitor, 1);
-    static ItemStack capTEResonant     = new ItemStack(RFUContent.blockCapacitor, 1);
-    static ItemStack capEIOBasic       = new ItemStack(RFUContent.blockCapacitor, 1);
-    static ItemStack capEIODouble      = new ItemStack(RFUContent.blockCapacitor, 1);
-    static ItemStack capEIOVibrant     = new ItemStack(RFUContent.blockCapacitor, 1);
+    private static ItemStack capTEBasic        = new ItemStack(RFUContent.blockCapacitor, 1);
+    private static ItemStack capTEHardened     = new ItemStack(RFUContent.blockCapacitor, 1);
+    private static ItemStack capTEReinforced   = new ItemStack(RFUContent.blockCapacitor, 1);
+    private static ItemStack capTEResonant     = new ItemStack(RFUContent.blockCapacitor, 1);
+    private static ItemStack capEIOBasic       = new ItemStack(RFUContent.blockCapacitor, 1);
+    private static ItemStack capEIODouble      = new ItemStack(RFUContent.blockCapacitor, 1);
+    private static ItemStack capEIOVibrant     = new ItemStack(RFUContent.blockCapacitor, 1);
 
-    static ItemStack dialer            = new ItemStack(RFUContent.itemDialer, 1);
+    private static ItemStack dialer            = new ItemStack(RFUContent.itemDialer, 1);
 
-    static ItemStack rfSwitch          = new ItemStack(RFUContent.blockSwitch);
-    static ItemStack rfResistor        = new ItemStack(RFUContent.blockResistor);
-    static ItemStack rfDiode           = new ItemStack(RFUContent.blockDiode);
-    static ItemStack invisTess         = new ItemStack(RFUContent.blockInvisTess);
-    static ItemStack rfMeter           = new ItemStack(RFUContent.blockRFMeter);
+    private static ItemStack rfSwitch          = new ItemStack(RFUContent.blockSwitch);
+    private static ItemStack rfResistor        = new ItemStack(RFUContent.blockResistor);
+    private static ItemStack rfDiode           = new ItemStack(RFUContent.blockDiode);
+    private static ItemStack invisTess         = new ItemStack(RFUContent.blockInvisTess);
+    //private static ItemStack rfMeter           = new ItemStack(RFUContent.blockRFMeter);
 
-    static ItemStack itemTessEmpty     = new ItemStack(RFUContent.itemMaterialTess, 1, 0);
-    static ItemStack itemTessFull      = new ItemStack(RFUContent.itemMaterialTess, 1, 1);
-    static ItemStack itemDisplay       = new ItemStack(RFUContent.itemMaterialDisplay, 1, 0);
-    static ItemStack hardenedGlassPane = new ItemStack(RFUContent.itemMaterial, 1, 0);
+    private static ItemStack itemTessEmpty     = new ItemStack(RFUContent.itemMaterialTess, 1, 0);
+    private static ItemStack itemTessFull      = new ItemStack(RFUContent.itemMaterialTess, 1, 1);
+    //private static ItemStack itemDisplay       = new ItemStack(RFUContent.itemMaterialDisplay, 1, 0);
+    private static ItemStack hardenedGlassPane = new ItemStack(RFUContent.itemMaterial, 1, 0);
 
-    static ItemStack stoneSlab         = new ItemStack(Blocks.stone_slab, 1, 0);
-    static ItemStack coal              = new ItemStack(Items.coal, 1, 0);
-    static ItemStack lever             = new ItemStack(Blocks.lever, 1);
-    static ItemStack redstone          = new ItemStack(Items.redstone);
-    static ItemStack glassPane         = new ItemStack(Blocks.glass_pane, 1);
-    static ItemStack ingotIron         = new ItemStack(Items.iron_ingot, 1);
-    static ItemStack repeater          = new ItemStack(Items.repeater, 1);
-    static ItemStack netherQuartz      = new ItemStack(Items.quartz, 1);
-    static ItemStack diamond           = new ItemStack(Items.diamond);
+    private static ItemStack stoneSlab         = new ItemStack(Blocks.stone_slab, 1, 0);
+    private static ItemStack coal              = new ItemStack(Items.coal, 1, 0);
+    private static ItemStack lever             = new ItemStack(Blocks.lever, 1);
+    private static ItemStack redstone          = new ItemStack(Items.redstone);
+    private static ItemStack glassPane         = new ItemStack(Blocks.glass_pane, 1);
+    private static ItemStack ingotIron         = new ItemStack(Items.iron_ingot, 1);
+    private static ItemStack repeater          = new ItemStack(Items.repeater, 1);
+    private static ItemStack netherQuartz      = new ItemStack(Items.quartz, 1);
+    private static ItemStack diamond           = new ItemStack(Items.diamond);
 
-    static FluidStack fluidEnder       = new FluidStack(TFFluids.fluidEnder, 1000);
+    private static FluidStack fluidEnder       = new FluidStack(TFFluids.fluidEnder, 1000);
 
-    static NBTTagCompound compoundCapTEBasic = new NBTTagCompound();
-    static NBTTagCompound compoundCapTEHardened = new NBTTagCompound();
-    static NBTTagCompound compoundCapTEReinforced = new NBTTagCompound();
-    static NBTTagCompound compoundCapTEResonant = new NBTTagCompound();
-    static NBTTagCompound compoundCapEIOBasic = new NBTTagCompound();
-    static NBTTagCompound compoundCapEIODouble = new NBTTagCompound();
-    static NBTTagCompound compoundCapEIOVibrant = new NBTTagCompound();
+    private static NBTTagCompound compoundCapTEBasic = new NBTTagCompound();
+    private static NBTTagCompound compoundCapTEHardened = new NBTTagCompound();
+    private static NBTTagCompound compoundCapTEReinforced = new NBTTagCompound();
+    private static NBTTagCompound compoundCapTEResonant = new NBTTagCompound();
+    private static NBTTagCompound compoundCapEIOBasic = new NBTTagCompound();
+    private static NBTTagCompound compoundCapEIODouble = new NBTTagCompound();
+    private static NBTTagCompound compoundCapEIOVibrant = new NBTTagCompound();
 
     public static void init()
     {
@@ -92,8 +92,8 @@ public class CraftingRecipes
         GameRegistry.addRecipe(new ShapedOreRecipe(rfDiode,           "   ", "EQE", "SSS", 'E', "ingotElectrum", 'Q', netherQuartz, 'S', stoneSlab));
         GameRegistry.addRecipe(new ShapedOreRecipe(rfResistor,        "   ", "ECE", "SSS", 'E', "ingotElectrum", 'C', coal, 'S', stoneSlab));
         GameRegistry.addRecipe(new ShapedOreRecipe(rfSwitch,          " L ", "ERE", "SSS", 'E', "ingotElectrum", 'L', lever, 'R', redstone, 'S', stoneSlab));
-        GameRegistry.addRecipe(new ShapedOreRecipe(itemDisplay,       "III", "IGI", "EEE", 'I', ingotIron, 'G', glassPane, 'E', "nuggetElectrum"));
-        GameRegistry.addRecipe(new ShapedOreRecipe(rfMeter,           " D ", "ERE", "SSS", 'D', itemDisplay, 'E', "ingotElectrum", 'R', repeater, 'S', stoneSlab));
+        //GameRegistry.addRecipe(new ShapedOreRecipe(itemDisplay,       "III", "IGI", "EEE", 'I', ingotIron, 'G', glassPane, 'E', "nuggetElectrum"));
+        //GameRegistry.addRecipe(new ShapedOreRecipe(rfMeter,           " D ", "ERE", "SSS", 'D', itemDisplay, 'E', "ingotElectrum", 'R', repeater, 'S', stoneSlab));
 
         if (Loader.isModLoaded("ThermalExpansion"))
         {

@@ -15,7 +15,19 @@
 
 package XFactHD.rfutilities.common.blocks.tileEntity;
 
-public class TileEntityTransistor
-{
+import net.minecraft.nbt.NBTTagCompound;
 
+public class TileEntityTransistor extends TileEntityBaseRFU
+{
+    @Override
+    public void readCustomNBT(NBTTagCompound nbt, boolean descPacket)
+    {
+
+    }
+
+    @Override
+    public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket)
+    {
+
+    }
 }

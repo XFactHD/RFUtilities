@@ -17,9 +17,6 @@ package XFactHD.rfutilities;
 
 import XFactHD.rfutilities.common.CommonProxy;
 import XFactHD.rfutilities.common.RFUContent;
-import XFactHD.rfutilities.common.net.PacketGetThroughput;
-import XFactHD.rfutilities.common.net.PacketSetThroughput;
-import XFactHD.rfutilities.common.net.PacketWantThroughput;
 import XFactHD.rfutilities.common.utils.LogHelper;
 import XFactHD.rfutilities.common.utils.Reference;
 import cpw.mods.fml.common.Loader;
@@ -30,9 +27,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -46,7 +41,7 @@ public class RFUtilities
     public static RFUtilities instance;
 
     @SidedProxy(clientSide = Reference.CLIENT_PROXY, serverSide = Reference.SERVER_PROXY)
-    public static CommonProxy proxy;
+    private static CommonProxy proxy;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)

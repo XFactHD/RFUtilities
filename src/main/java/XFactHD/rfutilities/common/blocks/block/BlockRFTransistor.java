@@ -15,7 +15,34 @@
 
 package XFactHD.rfutilities.common.blocks.block;
 
-public class BlockRFTransistor
-{
+import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityTransistor;
+import net.minecraft.block.material.Material;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
+public class BlockRFTransistor extends BlockBaseRFU
+{
+    public BlockRFTransistor()
+    {
+        super("blockTransistor", Material.iron, 1, ItemBlock.class, "");
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(World world, int meta)
+    {
+        return null;
+    }
+
+    @Override
+    public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side)
+    {
+        TileEntity te = world.getTileEntity(x, y, z);
+        if (te instanceof TileEntityTransistor)
+        {
+            //return ((TileEntityTransistor)te)
+        }
+        return false;
+    }
 }

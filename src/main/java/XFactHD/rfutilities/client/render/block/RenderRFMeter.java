@@ -51,7 +51,9 @@ public class RenderRFMeter extends TileEntitySpecialRenderer
     {
         final ResourceLocation textureLocation = new ResourceLocation(Reference.MOD_ID.toLowerCase(), "textures/models/modelEnergyMeter.png");
         int lastRFDisp = ((TileEntityRFMeter)te).lastRFDisp;
+        String lastRFMark = ((TileEntityRFMeter)te).lastRFMark;
         int transferedRFDisp = ((TileEntityRFMeter)te).transferedRFDisp;
+        String transferedRFMark = ((TileEntityRFMeter)te).transferedRFMark;
 
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x + 0.5F, (float) y + 1.5F, (float) z + 0.5F);

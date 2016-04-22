@@ -17,7 +17,9 @@ package XFactHD.rfutilities.common.blocks.tileEntity;
 
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityCapacitor extends TileEntityBaseRFU implements IEnergyHandler
@@ -44,9 +46,9 @@ public class TileEntityCapacitor extends TileEntityBaseRFU implements IEnergyHan
         switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
         {
             case 2: if(fd == ForgeDirection.SOUTH) return storage.receiveEnergy(amount, simulate);
-            case 3: if(fd == ForgeDirection.WEST) return storage.receiveEnergy(amount, simulate);
+            case 3: if(fd == ForgeDirection.WEST)  return storage.receiveEnergy(amount, simulate);
             case 4: if(fd == ForgeDirection.NORTH) return storage.receiveEnergy(amount, simulate);
-            case 5: if(fd == ForgeDirection.EAST) return storage.receiveEnergy(amount, simulate);
+            case 5: if(fd == ForgeDirection.EAST)  return storage.receiveEnergy(amount, simulate);
             default: return 0;
         }
     }
@@ -57,9 +59,9 @@ public class TileEntityCapacitor extends TileEntityBaseRFU implements IEnergyHan
         switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
         {
             case 2: if(fd == ForgeDirection.NORTH) return storage.extractEnergy(amount, simulate);
-            case 3: if(fd == ForgeDirection.EAST) return storage.extractEnergy(amount, simulate);
+            case 3: if(fd == ForgeDirection.EAST)  return storage.extractEnergy(amount, simulate);
             case 4: if(fd == ForgeDirection.SOUTH) return storage.extractEnergy(amount, simulate);
-            case 5: if(fd == ForgeDirection.WEST) return storage.extractEnergy(amount, simulate);
+            case 5: if(fd == ForgeDirection.WEST)  return storage.extractEnergy(amount, simulate);
             default: return 0;
         }
     }
@@ -89,59 +91,33 @@ public class TileEntityCapacitor extends TileEntityBaseRFU implements IEnergyHan
         transferEnergy(worldObj.getBlockMetadata(xCoord, yCoord, zCoord));
     }
 
-    public int transferEnergy(int meta)
+    private int transferEnergy(int meta)
     {
         if (!worldObj.isRemote)
         {
             switch (meta)
             {
-                case 2: return transferN();
-                case 3: return transferE();
-                case 4: return transferS();
-                case 5: return transferW();
+                case 2: return transferPower(ForgeDirection.NORTH);
+                case 3: return transferPower(ForgeDirection.EAST);
+                case 4: return transferPower(ForgeDirection.SOUTH);
+                case 5: return transferPower(ForgeDirection.WEST);
                 default: return 0;
             }
         }
         return 0;
     }
 
-    public int transferN()
+    private int transferPower(ForgeDirection fd)
     {
-        if (worldObj.getTileEntity(xCoord, yCoord, zCoord-1) instanceof IEnergyHandler && ((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord-1)).receiveEnergy(ForgeDirection.SOUTH, storage.extractEnergy(storage.getMaxExtract(), true), true) > 0)
+        TileEntity te = worldObj.getTileEntity(xCoord+fd.offsetX, yCoord, zCoord+fd.offsetZ);
+        if (te instanceof IEnergyReceiver && ((IEnergyReceiver)te).receiveEnergy(fd.getOpposite(), storage.extractEnergy(storage.getMaxExtract(), true), true) > 0)
         {
-            return ((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord-1)).receiveEnergy(ForgeDirection.SOUTH, storage.extractEnergy(storage.getMaxExtract(), type==0), false);
+            return ((IEnergyReceiver)te).receiveEnergy(fd.getOpposite(), storage.extractEnergy(storage.getMaxExtract(), type==0), false);
         }
         return 0;
     }
 
-    public int transferE()
-    {
-        if (worldObj.getTileEntity(xCoord+1, yCoord, zCoord) instanceof IEnergyHandler && ((IEnergyHandler)worldObj.getTileEntity(xCoord+1, yCoord, zCoord)).receiveEnergy(ForgeDirection.WEST, storage.extractEnergy(storage.getMaxExtract(), true), true) > 0)
-        {
-            return ((IEnergyHandler)worldObj.getTileEntity(xCoord+1, yCoord, zCoord)).receiveEnergy(ForgeDirection.WEST, storage.extractEnergy(storage.getMaxExtract(), type==0), false);
-        }
-        return 0;
-    }
-
-    public int transferS()
-    {
-        if (worldObj.getTileEntity(xCoord, yCoord, zCoord+1) instanceof IEnergyHandler && ((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord+1)).receiveEnergy(ForgeDirection.NORTH, storage.extractEnergy(storage.getMaxExtract(), true), true) > 0)
-        {
-            return ((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord+1)).receiveEnergy(ForgeDirection.NORTH, storage.extractEnergy(storage.getMaxExtract(), type==0), false);
-        }
-        return 0;
-    }
-
-    public int transferW()
-    {
-        if (worldObj.getTileEntity(xCoord-1, yCoord, zCoord) instanceof IEnergyHandler && ((IEnergyHandler)worldObj.getTileEntity(xCoord-1, yCoord, zCoord)).receiveEnergy(ForgeDirection.EAST, storage.extractEnergy(storage.getMaxExtract(), true), true) > 0)
-        {
-            return ((IEnergyHandler)worldObj.getTileEntity(xCoord-1, yCoord, zCoord)).receiveEnergy(ForgeDirection.EAST, storage.extractEnergy(storage.getMaxExtract(), type==0), false);
-        }
-        return 0;
-    }
-
-    public int storageByType()
+    private int storageByType()
     {
         switch (type)
         {
@@ -157,7 +133,7 @@ public class TileEntityCapacitor extends TileEntityBaseRFU implements IEnergyHan
         }
     }
 
-    public int receiveByType()
+    private int receiveByType()
     {
         switch (type)
         {
@@ -172,7 +148,7 @@ public class TileEntityCapacitor extends TileEntityBaseRFU implements IEnergyHan
         }
     }
 
-    public int extractByType()
+    private int extractByType()
     {
         switch (type)
         {

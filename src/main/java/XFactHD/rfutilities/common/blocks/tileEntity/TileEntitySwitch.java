@@ -16,6 +16,7 @@
 package XFactHD.rfutilities.common.blocks.tileEntity;
 
 import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -40,44 +41,16 @@ public class TileEntitySwitch extends TileEntityBaseRFU implements IEnergyHandle
     @Override
     public int receiveEnergy(ForgeDirection fd, int amount, boolean simulate)
     {
-        switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
+        ForgeDirection opposite = fd.getOpposite();
+        TileEntity te = worldObj.getTileEntity(xCoord + opposite.offsetX, yCoord, zCoord + opposite.offsetZ);
+        if (canConnectEnergy(fd) && te instanceof IEnergyReceiver && (((IEnergyReceiver)te).receiveEnergy(fd, amount, true) > 0) && isOn)
         {
-            case 2: if ((fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH) && isOn) return receiveNS(fd, amount, simulate);
-            case 3: if ((fd == ForgeDirection.EAST || fd == ForgeDirection.WEST) && isOn) return receiveEW(fd, amount, simulate);
-            case 4: if ((fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH) && isOn) return receiveNS(fd, amount, simulate);
-            case 5: if ((fd == ForgeDirection.EAST || fd == ForgeDirection.WEST) && isOn) return receiveEW(fd, amount, simulate);
-            default: return 0;
+            return ((IEnergyReceiver)te).receiveEnergy(fd, amount, simulate);
         }
-    }
-
-    public int receiveNS(ForgeDirection fd, int amount, boolean simulate)
-    {
-        if (fd == ForgeDirection.NORTH && (worldObj.getTileEntity(xCoord, yCoord, zCoord + 1) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord + 1)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
+        else
         {
-            TileEntity te = worldObj.getTileEntity(xCoord, yCoord, zCoord + 1);
-            return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
+            return 0;
         }
-        else if (fd == ForgeDirection.SOUTH && (worldObj.getTileEntity(xCoord, yCoord, zCoord - 1) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord - 1)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
-        {
-            TileEntity te = worldObj.getTileEntity(xCoord, yCoord, zCoord - 1);
-            return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-        }
-        return 0;
-    }
-
-    public int receiveEW(ForgeDirection fd, int amount, boolean simulate)
-    {
-        if (fd == ForgeDirection.WEST && (worldObj.getTileEntity(xCoord + 1, yCoord, zCoord) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord + 1, yCoord, zCoord)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
-        {
-            TileEntity te = worldObj.getTileEntity(xCoord + 1, yCoord, zCoord);
-            return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-        }
-        else if (fd == ForgeDirection.EAST && (worldObj.getTileEntity(xCoord - 1, yCoord, zCoord) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord - 1, yCoord, zCoord)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
-        {
-            TileEntity te = worldObj.getTileEntity(xCoord - 1, yCoord, zCoord);
-            return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-        }
-        return 0;
     }
 
     @Override

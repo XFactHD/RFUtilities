@@ -16,7 +16,9 @@
 package XFactHD.rfutilities.common.blocks.tileEntity;
 
 import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityDiode extends TileEntityBaseRFU implements IEnergyHandler
@@ -41,48 +43,23 @@ public class TileEntityDiode extends TileEntityBaseRFU implements IEnergyHandler
         {
             switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
             {
-                case 2: return fd == ForgeDirection.SOUTH ? receiveS(fd, amount, simulate) : 0;
-                case 3: return fd == ForgeDirection.WEST ? receiveW(fd, amount, simulate) : 0;
-                case 4: return fd == ForgeDirection.NORTH ? receiveN(fd, amount, simulate) : 0;
-                case 5: return fd == ForgeDirection.EAST ? receiveE(fd, amount, simulate) : 0;
+                case 2: return fd == ForgeDirection.SOUTH ? receivePower(fd, amount, simulate) : 0;
+                case 3: return fd == ForgeDirection.WEST  ? receivePower(fd, amount, simulate) : 0;
+                case 4: return fd == ForgeDirection.NORTH ? receivePower(fd, amount, simulate) : 0;
+                case 5: return fd == ForgeDirection.EAST  ? receivePower(fd, amount, simulate) : 0;
                 default: return 0;
             }
         }
         return 0;
     }
 
-    public int receiveN(ForgeDirection fd, int amount, boolean simulate)
+    private int receivePower(ForgeDirection fd, int amount, boolean simulate)
     {
-        if (worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ) instanceof IEnergyHandler && ((IEnergyHandler)worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ)).receiveEnergy(fd, amount, true) > 0)
+        ForgeDirection opposite = fd.getOpposite();
+        TileEntity te = worldObj.getTileEntity(xCoord+opposite.offsetX, yCoord, zCoord+opposite.offsetZ);
+        if (te instanceof IEnergyReceiver && ((IEnergyReceiver)te).receiveEnergy(fd, amount, true) > 0)
         {
-            return ((IEnergyHandler)worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ)).receiveEnergy(fd, amount, simulate);
-        }
-        return 0;
-    }
-
-    public int receiveS(ForgeDirection fd, int amount, boolean simulate)
-    {
-        if (worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ) instanceof IEnergyHandler && ((IEnergyHandler)worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ)).receiveEnergy(fd, amount, true) > 0)
-        {
-            return ((IEnergyHandler)worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ)).receiveEnergy(fd, amount, simulate);
-        }
-        return 0;
-    }
-
-    public int receiveE(ForgeDirection fd, int amount, boolean simulate)
-    {
-        if (worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ) instanceof IEnergyHandler && ((IEnergyHandler)worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ)).receiveEnergy(fd, amount, true) > 0)
-        {
-            return ((IEnergyHandler)worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ)).receiveEnergy(fd, amount, simulate);
-        }
-        return 0;
-    }
-
-    public int receiveW(ForgeDirection fd, int amount, boolean simulate)
-    {
-        if (worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ) instanceof IEnergyHandler && ((IEnergyHandler)worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ)).receiveEnergy(fd, amount, true) > 0)
-        {
-            return ((IEnergyHandler)worldObj.getTileEntity(xCoord+fd.getOpposite().offsetX, yCoord, zCoord+fd.getOpposite().offsetZ)).receiveEnergy(fd, amount, simulate);
+            return ((IEnergyReceiver)te).receiveEnergy(fd, amount, simulate);
         }
         return 0;
     }

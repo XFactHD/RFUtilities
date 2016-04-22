@@ -18,6 +18,7 @@ package XFactHD.rfutilities.common.blocks.tileEntity;
 import XFactHD.rfutilities.common.blocks.interfaces.IEnergyTesseract;
 import XFactHD.rfutilities.common.utils.LogHelper;
 import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -26,19 +27,19 @@ import java.util.ArrayList;
 
 public class TileEntityInvisibleTesseract extends TileEntityBaseRFU implements IEnergyTesseract, IEnergyHandler
 {
-    boolean initialized = false;
-    int ticksUntilInit = 1;
+    private boolean initialized = false;
+    private int ticksUntilInit = 1;
     public boolean hidden = false;
     public boolean isActive = false;
     public boolean isSender = true;
     public TileEntityInvisibleTesseract dialedSender = null;
-    public ArrayList<TileEntityInvisibleTesseract> tesseracts = new ArrayList<TileEntityInvisibleTesseract>();
-    int[] xPosDialedReceivers;
-    int[] yPosDialedReceivers;
-    int[] zPosDialedReceivers;
-    int xPosDialedSender;
-    int yPosDialedSender;
-    int zPosDialedSender;
+    private ArrayList<TileEntityInvisibleTesseract> tesseracts = new ArrayList<TileEntityInvisibleTesseract>();
+    private int[] xPosDialedReceivers;
+    private int[] yPosDialedReceivers;
+    private int[] zPosDialedReceivers;
+    private int xPosDialedSender;
+    private int yPosDialedSender;
+    private int zPosDialedSender;
 
     public TileEntityInvisibleTesseract()
     {
@@ -72,7 +73,7 @@ public class TileEntityInvisibleTesseract extends TileEntityBaseRFU implements I
         }
     }
 
-    public void initialize()
+    private void initialize()
     {
         if (isSender && isActive)
         {
@@ -251,9 +252,10 @@ public class TileEntityInvisibleTesseract extends TileEntityBaseRFU implements I
                 break;
             }
         }
-        if (worldObj.getTileEntity(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ) instanceof IEnergyHandler && (((IEnergyHandler) worldObj.getTileEntity(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ)).receiveEnergy(fd.getOpposite(), amount, true)) > 0)
+        TileEntity te = worldObj.getTileEntity(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ);
+        if (te instanceof IEnergyReceiver && (((IEnergyReceiver)te).receiveEnergy(fd.getOpposite(), amount, true)) > 0)
         {
-            return (((IEnergyHandler) worldObj.getTileEntity(xCoord + fd.offsetX, yCoord + fd.offsetY, zCoord + fd.offsetZ)).receiveEnergy(fd.getOpposite(), amount, simulate));
+            return (((IEnergyReceiver)te).receiveEnergy(fd.getOpposite(), amount, simulate));
         }
         return 0;
     }

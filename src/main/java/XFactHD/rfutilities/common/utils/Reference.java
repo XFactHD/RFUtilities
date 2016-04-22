@@ -19,7 +19,7 @@ public class Reference
 {
     public static final String MOD_ID = "rfutilities";
     public static final String MOD_NAME = "RFUtilities";
-    public static final String VERSION = "0.3-hotfix2";
+    public static final String VERSION = "0.4";
     public static final String SERVER_PROXY = "XFactHD.rfutilities.common.CommonProxy";
     public static final String CLIENT_PROXY = "XFactHD.rfutilities.client.ClientProxy";
     public static final String DEPENDENCIES = "required-after:CoFHCore;" + "after:ThermalExpansion";

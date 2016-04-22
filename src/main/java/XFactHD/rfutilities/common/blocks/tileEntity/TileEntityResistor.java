@@ -18,8 +18,11 @@ package XFactHD.rfutilities.common.blocks.tileEntity;
 import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.net.PacketGetThroughput;
 import XFactHD.rfutilities.common.net.PacketSetThroughput;
+import XFactHD.rfutilities.common.net.PacketSetTransferMode;
 import XFactHD.rfutilities.common.net.PacketWantThroughput;
 import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyReceiver;
+import cofh.thermalexpansion.block.cell.TileCellCreative;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,6 +32,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class TileEntityResistor extends TileEntityBaseRFU implements IEnergyHandler
 {
     public int throughput = 0;
+    private boolean transferOncePerTick = false;
+    //private boolean wait = false;
 
     @Override
     public boolean canConnectEnergy(ForgeDirection fd)
@@ -44,75 +49,37 @@ public class TileEntityResistor extends TileEntityBaseRFU implements IEnergyHand
     }
 
     @Override
+    public void updateEntity()
+    {
+        super.updateEntity();
+        //wait = false;
+    }
+
+    @Override
     public int receiveEnergy(ForgeDirection fd, int amount, boolean simulate)
     {
-        switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
-        {
-            case 2: if (fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH) return receiveNS(fd, amount, simulate);
-            case 3: if (fd == ForgeDirection.EAST || fd == ForgeDirection.WEST) return receiveEW(fd, amount, simulate);
-            case 4: if (fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH) return receiveNS(fd, amount, simulate);
-            case 5: if (fd == ForgeDirection.EAST || fd == ForgeDirection.WEST) return receiveEW(fd, amount, simulate);
-            default: return 0;
-        }
-    }
+        //if (transferOncePerTick && !wait)
+        //{
+        //    wait = true;
+        //}
 
-    public int receiveNS(ForgeDirection fd, int amount, boolean simulate)
-    {
-        if (fd == ForgeDirection.NORTH && (worldObj.getTileEntity(xCoord, yCoord, zCoord + 1) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord + 1)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
+        ForgeDirection opposite = fd.getOpposite();
+        TileEntity te = worldObj.getTileEntity(xCoord + opposite.offsetX, yCoord, zCoord + opposite.offsetZ);
+        if (canConnectEnergy(fd) && te instanceof IEnergyReceiver && (((IEnergyReceiver)te).receiveEnergy(fd, amount, true) > 0))
         {
-            TileEntity te = worldObj.getTileEntity(xCoord, yCoord, zCoord + 1);
             if (amount<=throughput)
             {
-                return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
+                return ((IEnergyReceiver)te).receiveEnergy(fd, amount, simulate);
             }
             else
             {
-                return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), throughput, simulate);
+                return ((IEnergyReceiver)te).receiveEnergy(fd, throughput, simulate);
             }
-
         }
-        else if (fd == ForgeDirection.SOUTH && (worldObj.getTileEntity(xCoord, yCoord, zCoord - 1) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord - 1)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
+        else
         {
-            TileEntity te = worldObj.getTileEntity(xCoord, yCoord, zCoord - 1);
-            if (amount<=throughput)
-            {
-                return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-            }
-            else
-            {
-                return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), throughput, simulate);
-            }
+            return 0;
         }
-        return 0;
-    }
-
-    public int receiveEW(ForgeDirection fd, int amount, boolean simulate)
-    {
-        if (fd == ForgeDirection.WEST && (worldObj.getTileEntity(xCoord + 1, yCoord, zCoord) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord + 1, yCoord, zCoord)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
-        {
-            TileEntity te = worldObj.getTileEntity(xCoord + 1, yCoord, zCoord);
-            if (amount<=throughput)
-            {
-                return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-            }
-            else
-            {
-                return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), throughput, simulate);
-            }
-        }
-        else if (fd == ForgeDirection.EAST && (worldObj.getTileEntity(xCoord - 1, yCoord, zCoord) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord - 1, yCoord, zCoord)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
-        {
-            TileEntity te = worldObj.getTileEntity(xCoord - 1, yCoord, zCoord);
-            if (amount<=throughput)
-            {
-                return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-            }
-            else
-            {
-                return ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), throughput, simulate);
-            }
-        }
-        return 0;
     }
 
     public void setThroughput(int value)
@@ -147,6 +114,25 @@ public class TileEntityResistor extends TileEntityBaseRFU implements IEnergyHand
         }
     }
 
+    public void setTransferOncePerTick(boolean once)
+    {
+        if (worldObj.isRemote)
+        {
+            RFUtilities.RFU_NET_WRAPPER.sendToServer(new PacketSetTransferMode(xCoord, yCoord, zCoord, once));
+            transferOncePerTick = once;
+        }
+        else
+        {
+            transferOncePerTick = once;
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
+    }
+
+    public boolean getTransferOncePerTick()
+    {
+        return transferOncePerTick;
+    }
+
     @Override
     public int extractEnergy(ForgeDirection forgeDirection, int amount, boolean simulate)
     {
@@ -169,11 +155,13 @@ public class TileEntityResistor extends TileEntityBaseRFU implements IEnergyHand
     public void readCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
         throughput = nbt.getInteger("throughput");
+        transferOncePerTick = nbt.getBoolean("transferMode");
     }
 
     @Override
     public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
         nbt.setInteger("throughput", throughput);
+        nbt.setBoolean("transferMode", transferOncePerTick);
     }
 }

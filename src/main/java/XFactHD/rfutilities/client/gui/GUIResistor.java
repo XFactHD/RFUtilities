@@ -18,9 +18,9 @@ package XFactHD.rfutilities.client.gui;
 import XFactHD.rfutilities.client.utils.ClientUtils;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityResistor;
 import XFactHD.rfutilities.common.gui.ContainerResistor;
-import XFactHD.rfutilities.common.utils.LogHelper;
 import XFactHD.rfutilities.common.utils.Reference;
 import cofh.core.gui.GuiLimitedTextField;
+import cpw.mods.fml.client.config.GuiCheckBox;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -29,14 +29,14 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 public class GUIResistor extends GuiContainer
 {
     public EntityPlayer player;
     public GuiTextField value;
     public TileEntityResistor tile;
-    public boolean buttonAcceptEnabled = false;
+    private boolean buttonAcceptEnabled = false;
+    //private boolean transferMultiplePerTick = false;
 
     public GUIResistor(InventoryPlayer inv, TileEntityResistor te)
     {
@@ -61,28 +61,33 @@ public class GUIResistor extends GuiContainer
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         ClientUtils.bindTexture(Reference.GUI_FOLDER + "GUI_Resistor.png");
-        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, 120, 100);
+        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, 120, 114);
         value.drawTextBox();
         value.setText(value.getText());
-        drawString(fontRendererObj, "RF/t", guiLeft + 80, guiTop + 17, 16);
+        drawString(fontRendererObj, EnumChatFormatting.WHITE + "RF/t", guiLeft + 80, guiTop + 17, 16);
+        //drawString(fontRendererObj, EnumChatFormatting.WHITE + "Allow multiple transfers per tick?", guiLeft + 20, guiTop + 36, 10);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void initGui()
     {
         super.initGui();
         Keyboard.enableRepeatEvents(true);
-        GuiButton accept = new GuiButton(0, guiLeft + 20, guiTop + 37, 80, 20, StatCollector.translateToLocal("guiDesc.rfutilities:accept.name"));
-        GuiButton decline = new GuiButton(1, guiLeft + 20, guiTop + 65, 80, 20, StatCollector.translateToLocal("guiDesc.rfutilities:decline.name"));
+        GuiButton accept = new GuiButton(0, guiLeft + 20, guiTop + 55, 80, 20, StatCollector.translateToLocal("guiDesc.rfutilities:accept.name"));
+        GuiButton decline = new GuiButton(1, guiLeft + 20, guiTop + 83, 80, 20, StatCollector.translateToLocal("guiDesc.rfutilities:decline.name"));
+        //GuiCheckBox transferControl = new GuiCheckBox(2, guiLeft + 15, guiTop + 36-36, "", true);
         value = new GuiLimitedTextField(this.fontRendererObj, guiLeft + 15, guiTop + 14, 90, 14, "0123456789");
         value.setCanLoseFocus(false);
         value.setFocused(true);
         value.setMaxStringLength(10);
         value.setText(Integer.toString(tile.getThroughput()));
-        buttonAcceptEnabled = !Integer.toString(tile.getThroughput()).equals(value.getText());
+        //transferControl.setIsChecked(!tile.getTransferOncePerTick());
+        buttonAcceptEnabled = !Integer.toString(tile.getThroughput()).equals(value.getText())/* || (((GuiCheckBox)this.buttonList.get(2)).isChecked() != transferMultiplePerTick)*/;
 
         this.buttonList.add(accept);
         this.buttonList.add(decline);
+        //this.buttonList.add(transferControl);
     }
 
     @Override
@@ -93,9 +98,9 @@ public class GUIResistor extends GuiContainer
         ((GuiButton)this.buttonList.get(0)).enabled = buttonAcceptEnabled;
     }
 
-    public void updateButtonAccept()
+    private void updateButtonAccept()
     {
-        buttonAcceptEnabled = !("".equals(value.getText())) && !Integer.toString(tile.getThroughput()).equals(value.getText());
+        buttonAcceptEnabled = (!("".equals(value.getText())) && !Integer.toString(tile.getThroughput()).equals(value.getText()))/* || (((GuiCheckBox)this.buttonList.get(2)).isChecked() != transferMultiplePerTick)*/;
     }
 
     @Override
@@ -124,7 +129,7 @@ public class GUIResistor extends GuiContainer
         }
         else if (button.id == 0)
         {
-            int throughput = 0;
+            int throughput;
             if (value.getText().length() == 10 && Integer.parseInt(value.getText().substring(0, 8)) > 21474836)
             {
                 throughput = Integer.MAX_VALUE;
@@ -135,8 +140,15 @@ public class GUIResistor extends GuiContainer
                 throughput = Integer.parseInt(value.getText());
             }
             tile.setThroughput(throughput);
+            //transferMultiplePerTick = ((GuiCheckBox)this.buttonList.get(2)).isChecked();
+            //tile.setTransferOncePerTick(!transferMultiplePerTick);
             this.updateButtonAccept();
         }
+        //else if (button.id == 2)
+        //{
+        //    //LogHelper.info("Click!");
+        //    updateButtonAccept();
+        //}
     }
 
     @Override

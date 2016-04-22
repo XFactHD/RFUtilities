@@ -18,6 +18,7 @@ package XFactHD.rfutilities.common;
 import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.net.PacketDialerChangeMode;
 import XFactHD.rfutilities.common.net.PacketSetThroughput;
+import XFactHD.rfutilities.common.net.PacketSetTransferMode;
 import XFactHD.rfutilities.common.net.PacketWantThroughput;
 import XFactHD.rfutilities.common.utils.ConfigHandler;
 import XFactHD.rfutilities.common.utils.EventHandler;
@@ -39,6 +40,7 @@ public class CommonProxy
         RFUtilities.RFU_NET_WRAPPER.registerMessage(PacketWantThroughput.HandlerPacketWantThroughput.class, PacketWantThroughput.class, 0, Side.SERVER);
         RFUtilities.RFU_NET_WRAPPER.registerMessage(PacketSetThroughput.HandlerPacketSetThroughput.class, PacketSetThroughput.class, 2, Side.SERVER);
         RFUtilities.RFU_NET_WRAPPER.registerMessage(PacketDialerChangeMode.HandlerPacketDialerChangeMode.class, PacketDialerChangeMode.class, 3, Side.SERVER);
+        RFUtilities.RFU_NET_WRAPPER.registerMessage(PacketSetTransferMode.HandlerPacketSetTransferMode.class, PacketSetTransferMode.class, 4, Side.SERVER);
         RFUContent.preInit();
     }
 

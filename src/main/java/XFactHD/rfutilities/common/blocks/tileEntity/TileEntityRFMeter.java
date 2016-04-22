@@ -15,17 +15,19 @@
 
 package XFactHD.rfutilities.common.blocks.tileEntity;
 
+import XFactHD.rfutilities.RFUtilities;
 import cofh.api.energy.IEnergyHandler;
+import cofh.thermalexpansion.block.cell.TileCellCreative;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityRFMeter extends TileEntityBaseRFU implements IEnergyHandler
 {
-    public int lastRF = 0;
+    private int lastRF = 0;
     public int lastRFDisp = 0;
     public String lastRFMark = "RF/t";
-    public int transferedRF = 0;
+    private int transferedRF = 0;
     public int transferedRFDisp = 0;
     public String transferedRFMark = "RF";
 
@@ -53,51 +55,20 @@ public class TileEntityRFMeter extends TileEntityBaseRFU implements IEnergyHandl
     @Override
     public int receiveEnergy(ForgeDirection fd, int amount, boolean simulate)
     {
-        switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
+        ForgeDirection opposite = fd.getOpposite();
+        TileEntity te = worldObj.getTileEntity(xCoord + opposite.offsetX, yCoord, zCoord + opposite.offsetZ);
+        if (canConnectEnergy(fd) && te instanceof IEnergyHandler && (((IEnergyHandler)te).receiveEnergy(fd, amount, true) > 0))
         {
-            case 2: if (fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH) return receiveNS(fd, amount, simulate);
-            case 3: if (fd == ForgeDirection.EAST || fd == ForgeDirection.WEST) return receiveEW(fd, amount, simulate);
-            case 4: if (fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH) return receiveNS(fd, amount, simulate);
-            case 5: if (fd == ForgeDirection.EAST || fd == ForgeDirection.WEST) return receiveEW(fd, amount, simulate);
-            default: return 0;
+            transferedRF = transferedRF + ((IEnergyHandler)te).receiveEnergy(fd, amount, true);
+            return lastRF = ((IEnergyHandler)te).receiveEnergy(fd, amount, simulate);
+        }
+        else
+        {
+            return 0;
         }
     }
 
-    public int receiveNS(ForgeDirection fd, int amount, boolean simulate)
-    {
-        if (fd == ForgeDirection.NORTH && (worldObj.getTileEntity(xCoord, yCoord, zCoord + 1) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord + 1)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
-        {
-            TileEntity te = worldObj.getTileEntity(xCoord, yCoord, zCoord + 1);
-            transferedRF = transferedRF + ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, true);
-            return lastRF = ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-        }
-        else if (fd == ForgeDirection.SOUTH && (worldObj.getTileEntity(xCoord, yCoord, zCoord - 1) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord, yCoord, zCoord - 1)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
-        {
-            TileEntity te = worldObj.getTileEntity(xCoord, yCoord, zCoord - 1);
-            transferedRF = transferedRF + ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, true);
-            return lastRF = ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-        }
-        return 0;
-    }
-
-    public int receiveEW(ForgeDirection fd, int amount, boolean simulate)
-    {
-        if (fd == ForgeDirection.WEST && (worldObj.getTileEntity(xCoord + 1, yCoord, zCoord) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord + 1, yCoord, zCoord)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
-        {
-            TileEntity te = worldObj.getTileEntity(xCoord + 1, yCoord, zCoord);
-            transferedRF = transferedRF + ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, true);
-            return lastRF = ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-        }
-        else if (fd == ForgeDirection.EAST && (worldObj.getTileEntity(xCoord - 1, yCoord, zCoord) instanceof IEnergyHandler) && (((IEnergyHandler)worldObj.getTileEntity(xCoord - 1, yCoord, zCoord)).receiveEnergy(fd.getOpposite(), amount, true) > 0))
-        {
-            TileEntity te = worldObj.getTileEntity(xCoord - 1, yCoord, zCoord);
-            transferedRF = transferedRF + ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, true);
-            return lastRF = ((IEnergyHandler)te).receiveEnergy(fd.getOpposite(), amount, simulate);
-        }
-        return 0;
-    }
-
-    public int transformLastRFScientific(int value)
+    private int transformLastRFScientific(int value)
     {
         if (value > 1000000000)
         {
@@ -121,7 +92,7 @@ public class TileEntityRFMeter extends TileEntityBaseRFU implements IEnergyHandl
         }
     }
 
-    public int transformTransferedScientific(int value)
+    private int transformTransferedScientific(int value)
     {
         if (value > 1000000000)
         {
@@ -166,22 +137,12 @@ public class TileEntityRFMeter extends TileEntityBaseRFU implements IEnergyHandl
     @Override
     public void readCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
-        lastRF = nbt.getInteger("lastRF");
-        lastRFDisp = nbt.getInteger("lastRFDisp");
-        lastRFMark = nbt.getString("lastRFMark");
-        transferedRF = nbt.getInteger("transferedRF");
-        transferedRFDisp = nbt.getInteger("transferedRFDisp");
-        transferedRFMark = nbt.getString("transferedRFMark");
+
     }
 
     @Override
     public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket)
     {
-        nbt.setInteger("lastRF", lastRF);
-        nbt.setInteger("lastRFDisp", lastRFDisp);
-        nbt.setString("lastRFMark", lastRFMark);
-        nbt.setInteger("transferedRF", transferedRF);
-        nbt.setInteger("transferedRFDisp", transferedRFDisp);
-        nbt.setString("transferedRFMark", transferedRFMark);
+
     }
 }
