@@ -15,7 +15,7 @@
 
 package XFactHD.rfutilities.common.blocks.itemBlock;
 
-import XFactHD.rfutilities.common.blocks.block.BlockRFCapacitor;
+import XFactHD.rfutilities.common.blocks.block.BlockCapacitor;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityCapacitor;
 import cpw.mods.fml.common.Loader;
 import net.minecraft.block.Block;
@@ -42,7 +42,7 @@ public class ItemBlockRFCapacitor extends ItemBlock
     @Override
     public boolean onBlockDestroyed(ItemStack stack, World world, Block block, int x, int y, int z, EntityLivingBase entity)
     {
-        if (entity instanceof EntityPlayer && block instanceof BlockRFCapacitor)
+        if (entity instanceof EntityPlayer && block instanceof BlockCapacitor)
         {
             NBTTagCompound compound = new NBTTagCompound();
             compound.setInteger("type", ((TileEntityCapacitor)world.getTileEntity(x, y, z)).type);

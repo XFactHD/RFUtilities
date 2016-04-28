@@ -46,6 +46,7 @@ public class ClientProxy extends CommonProxy
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityResistor.class, new RenderResistor());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDiode.class, new RenderDiode());
         //ClientRegistry.bindTileEntitySpecialRenderer(TileEntityRFMeter.class, new RenderRFMeter());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTransistor.class, new RenderTransistor());
     }
 
     @Override
@@ -60,6 +61,7 @@ public class ClientProxy extends CommonProxy
         //MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(RFUContent.blockRFMeter), new ItemRendererRFMeter());
         MinecraftForgeClient.registerItemRenderer(RFUContent.itemMaterialTess, new ItemRendererMaterialTess());
         //MinecraftForgeClient.registerItemRenderer(RFUContent.itemMaterialDisplay, new ItemRendererMaterialDisplay());
+        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(RFUContent.blockTransistor), new ItemRendererTransistor());
         FMLCommonHandler.instance().bus().register(new KeyInputHandler());
         KeyBindings.init();
     }

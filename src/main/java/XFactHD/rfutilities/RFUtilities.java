@@ -36,6 +36,9 @@ public class RFUtilities
 {
     public static SimpleNetworkWrapper RFU_NET_WRAPPER;
     public static boolean TE_LOADED = false;
+    public static boolean OC_LOADED = false;
+    public static boolean CC_LOADED = false;
+
 
     @Mod.Instance(Reference.MOD_ID)
     public static RFUtilities instance;
@@ -48,6 +51,8 @@ public class RFUtilities
     {
         LogHelper.info("Hello Minecraft!");
         TE_LOADED = Loader.isModLoaded("ThermalExpansion");
+        OC_LOADED = Loader.isModLoaded("OpenComputers");
+        CC_LOADED = Loader.isModLoaded("ComputerCraft");
         RFU_NET_WRAPPER = NetworkRegistry.INSTANCE.newSimpleChannel("rfu");
         proxy.preInit(event);
         LogHelper.info("PreInit complete");

@@ -25,7 +25,7 @@ import org.lwjgl.opengl.GL11;
 
 public class ItemRendererSwitch implements IItemRenderer
 {
-    ModelSwitchFloat model = new ModelSwitchFloat();
+    private ModelSwitchFloat model = new ModelSwitchFloat();
 
     @Override
     public void renderItem(ItemRenderType type, ItemStack item, Object... data)

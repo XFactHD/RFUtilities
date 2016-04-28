@@ -67,6 +67,9 @@ public class ItemDialer extends ItemBaseRFU
         if (!world.isRemote && player.isSneaking() && stack.stackTagCompound.getBoolean("modeDial"))
         {
             stack.setTagCompound(null);
+            NBTTagCompound compound = new NBTTagCompound();
+            compound.setBoolean("modeDial", true);
+            stack.setTagCompound(compound);
             player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:clearedDialer.name")));
         }
         return stack;

@@ -42,19 +42,19 @@ public class RFUContent
     {
         //itemMaterialDisplay = new ItemMaterialDisplay();
 
-        blockCapacitor = new BlockRFCapacitor();
-        blockSwitch = new BlockRFSwitch();
-        blockResistor = new BlockRFResistor();
+        blockCapacitor = new BlockCapacitor();
+        blockSwitch = new BlockSwitch();
+        blockResistor = new BlockResistor();
         blockDiode = new BlockDiode();
         //blockRFMeter = new BlockRFMeter();
-        //blockTransistor = new BlockTransistor();
+        blockTransistor = new BlockTransistor();
 
         GameRegistry.registerTileEntity(TileEntityCapacitor.class, "tileCapacitor");
         GameRegistry.registerTileEntity(TileEntitySwitch.class, "tileSwitch");
         GameRegistry.registerTileEntity(TileEntityResistor.class, "tileResistor");
         GameRegistry.registerTileEntity(TileEntityDiode.class, "tileDiode");
         //GameRegistry.registerTileEntity(TileEntityRFMeter.class, "tileRFMeter");
-        //GameRegistry.registerTileEntity(TileEntityTransistor.class, "tileTransistor");
+        GameRegistry.registerTileEntity(TileEntityTransistor.class, "tileTransistor");
 
         if (Loader.isModLoaded("ThermalExpansion"))
         {

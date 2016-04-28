@@ -45,6 +45,7 @@ public class CraftingRecipes
     private static ItemStack rfDiode           = new ItemStack(RFUContent.blockDiode);
     private static ItemStack invisTess         = new ItemStack(RFUContent.blockInvisTess);
     //private static ItemStack rfMeter           = new ItemStack(RFUContent.blockRFMeter);
+    private static ItemStack rfTransistor      = new ItemStack(RFUContent.blockTransistor);
 
     private static ItemStack itemTessEmpty     = new ItemStack(RFUContent.itemMaterialTess, 1, 0);
     private static ItemStack itemTessFull      = new ItemStack(RFUContent.itemMaterialTess, 1, 1);
@@ -91,7 +92,8 @@ public class CraftingRecipes
 
         GameRegistry.addRecipe(new ShapedOreRecipe(rfDiode,           "   ", "EQE", "SSS", 'E', "ingotElectrum", 'Q', netherQuartz, 'S', stoneSlab));
         GameRegistry.addRecipe(new ShapedOreRecipe(rfResistor,        "   ", "ECE", "SSS", 'E', "ingotElectrum", 'C', coal, 'S', stoneSlab));
-        GameRegistry.addRecipe(new ShapedOreRecipe(rfSwitch,          " L ", "ERE", "SSS", 'E', "ingotElectrum", 'L', lever, 'R', redstone, 'S', stoneSlab));
+        GameRegistry.addRecipe(new ShapedOreRecipe(rfSwitch,          "   ", "ELE", "SSS", 'E', "ingotElectrum", 'L', lever, 'S', stoneSlab));
+        GameRegistry.addRecipe(new ShapedOreRecipe(rfTransistor,      " R ", "ELE", "SSS", 'E', "ingotElectrum", 'L', lever, 'R', redstone, 'S', stoneSlab));
         //GameRegistry.addRecipe(new ShapedOreRecipe(itemDisplay,       "III", "IGI", "EEE", 'I', ingotIron, 'G', glassPane, 'E', "nuggetElectrum"));
         //GameRegistry.addRecipe(new ShapedOreRecipe(rfMeter,           " D ", "ERE", "SSS", 'D', itemDisplay, 'E', "ingotElectrum", 'R', repeater, 'S', stoneSlab));
 

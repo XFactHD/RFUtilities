@@ -25,10 +25,10 @@ import net.minecraft.world.World;
 
 public class PacketGetThroughput implements IMessage
 {
-    public int x;
-    public int y;
-    public int z;
-    public int throughtput;
+    private int x;
+    private int y;
+    private int z;
+    private int throughtput;
 
     public PacketGetThroughput(){}
 
