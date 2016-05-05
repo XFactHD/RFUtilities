@@ -15,7 +15,6 @@
 
 package XFactHD.rfutilities.common.blocks.tileEntity;
 
-import XFactHD.rfutilities.RFUtilities;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyReceiver;
 import cpw.mods.fml.common.Optional;
@@ -24,7 +23,6 @@ import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.ManagedPeripheral;
 import li.cil.oc.api.network.SidedComponent;
 import li.cil.oc.api.network.SimpleComponent;
-import li.cil.oc.common.tileentity.Cable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -32,13 +30,14 @@ import net.minecraftforge.common.util.ForgeDirection;
 @Optional.InterfaceList
         ({
                 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers", striprefs = true),
-                @Optional.Interface(iface = "li.cil.oc.api.network.ManagedPeripheral", modid = "OpenComputers", striprefs = true)
+                @Optional.Interface(iface = "li.cil.oc.api.network.ManagedPeripheral", modid = "OpenComputers", striprefs = true),
+                @Optional.Interface(iface = "li.cil.oc.api.network.SidedComponent", modid = "OpenComputers", striprefs = true)
         })
 public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyHandler, SimpleComponent, SidedComponent, ManagedPeripheral
 {
     private boolean isOn = false;
-    private boolean ocConnected = false;
-    private String[] methods = new String[]{"setActive", "getActive"};
+    private String mode = "rs";
+    private String[] methods = new String[]{"setActive", "getActive", "setMode", "getMode"};
 
     public boolean canConnectRedstone(ForgeDirection fd)
     {
@@ -63,33 +62,37 @@ public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyHa
         worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
 
-    private boolean checkOCConnected()
-    {
-        boolean cable = false;
-        for (int i = 2; i < 6; i++)
-        {
-            ForgeDirection fd = ForgeDirection.getOrientation(i);
-            if (canConnectRedstone(ForgeDirection.getOrientation(i)))
-            {
-                TileEntity te = worldObj.getTileEntity(xCoord+fd.offsetX, yCoord, zCoord+fd.offsetZ);
-                cable = te instanceof Cable;
-            }
-        }
-        return cable;
-    }
-
     private Object[] call(String method, Object argument)
     {
         if ("setActive".equals(method) && argument instanceof Boolean)
         {
-            setIsOn(((Boolean)argument));
+            setIsOn((Boolean)argument);
             return new Object[]{null};
         }
         else if ("getActive".equals(method))
         {
             return new Object[]{getIsOn()};
         }
-        return new Object[]{null};
+        else if ("setMode".equals(method) && argument instanceof String && ("rs".equals(argument) || "oc".equals(argument)))
+        {
+            setMode((String)argument);
+            return new Object[]{null};
+        }
+        else if ("getMode".equals(method))
+        {
+            return new Object[]{getMode()};
+        }
+        return new Object[]{"Throw!"};
+    }
+
+    private void setMode(String mode)
+    {
+        this.mode = mode;
+    }
+
+    private String getMode()
+    {
+        return mode;
     }
 
     @Override
@@ -97,22 +100,8 @@ public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyHa
     {
         super.updateEntity();
         boolean on = isOn;
-        ForgeDirection fd = ForgeDirection.UNKNOWN;
-        for (int i = 2; i < 6; i++)
-        {
-            if (canConnectRedstone(ForgeDirection.getOrientation(i)))
-            {
-                fd = ForgeDirection.getOrientation(i);
-                break;
-            }
-        }
         boolean redstone = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
-
-        if (RFUtilities.OC_LOADED)
-        {
-            ocConnected = checkOCConnected();
-        }
-        if (!ocConnected && on != redstone)
+        if ("rs".equals(getMode()) && on != redstone)
         {
             setIsOn(redstone);
         }
@@ -190,11 +179,16 @@ public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyHa
     @Override
     public Object[] invoke(String method, Context context, Arguments arguments) throws Exception
     {
-        if (("setActive".equals(method) && arguments.count() == 1 && arguments.isBoolean(0)) || "getActive".equals(method))
+        if (("setActive".equals(method) && arguments.count() == 1 && arguments.isBoolean(0)) || ("setMode".equals(method) && arguments.count() == 1 && arguments.isString(0)) || ("getActive".equals(method) && arguments.count() == 0) || ("getMode".equals(method) && arguments.count() == 0))
         {
-            return call(method, arguments.checkBoolean(0));
+            Object[] result = call(method, arguments.checkAny(0));
+            if (result[0] != null && result[0].equals("Throw!"))
+            {
+                throw new NoSuchMethodException("Wrong argument!");
+            }
+            return result;
         }
-        throw new Exception("Wrong argument");
+        throw new NoSuchMethodException("Wrong argument!");
     }
 
     //NBT
