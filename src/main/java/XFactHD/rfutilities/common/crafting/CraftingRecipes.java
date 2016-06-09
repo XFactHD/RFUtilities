@@ -62,7 +62,7 @@ public class CraftingRecipes
     private static ItemStack netherQuartz      = new ItemStack(Items.quartz, 1);
     private static ItemStack diamond           = new ItemStack(Items.diamond);
 
-    private static FluidStack fluidEnder       = new FluidStack(TFFluids.fluidEnder, 1000);
+
 
     private static NBTTagCompound compoundCapTEBasic = new NBTTagCompound();
     private static NBTTagCompound compoundCapTEHardened = new NBTTagCompound();
@@ -71,6 +71,8 @@ public class CraftingRecipes
     private static NBTTagCompound compoundCapEIOBasic = new NBTTagCompound();
     private static NBTTagCompound compoundCapEIODouble = new NBTTagCompound();
     private static NBTTagCompound compoundCapEIOVibrant = new NBTTagCompound();
+
+    private static NBTTagCompound compoundDialer = new NBTTagCompound();
 
     public static void init()
     {
@@ -82,6 +84,8 @@ public class CraftingRecipes
         compoundCapEIODouble.setInteger("type", 6);
         compoundCapEIOVibrant.setInteger("type", 7);
 
+        compoundDialer.setBoolean("modeDial", true);
+
         capTEBasic.setTagCompound(compoundCapTEBasic);
         capTEHardened.setTagCompound(compoundCapTEHardened);
         capTEReinforced.setTagCompound(compoundCapTEReinforced);
@@ -89,6 +93,8 @@ public class CraftingRecipes
         capEIOBasic.setTagCompound(compoundCapEIOBasic);
         capEIODouble.setTagCompound(compoundCapEIODouble);
         capEIOVibrant.setTagCompound(compoundCapEIOVibrant);
+
+        dialer.setTagCompound(compoundDialer);
 
         GameRegistry.addRecipe(new ShapedOreRecipe(rfDiode,           "   ", "EQE", "SSS", 'E', "ingotElectrum", 'Q', netherQuartz, 'S', stoneSlab));
         GameRegistry.addRecipe(new ShapedOreRecipe(rfResistor,        "   ", "ECE", "SSS", 'E', "ingotElectrum", 'C', coal, 'S', stoneSlab));
@@ -107,7 +113,7 @@ public class CraftingRecipes
             GameRegistry.addRecipe(new ShapedOreRecipe(itemTessEmpty,     "EGE", "GDG", "EGE", 'E', "nuggetEnderium", 'G', hardenedGlassPane, 'D', diamond));
             GameRegistry.addRecipe(new ShapedOreRecipe(invisTess,         "BSB", "STS", "BSB", 'B', "ingotBronze", 'S', "ingotSilver", 'T', itemTessFull));
             GameRegistry.addRecipe(new ShapedOreRecipe(dialer,            " C ", "RBR", "III", 'C', MetaItemGetter.coil, 'R', redstone, 'B', Blocks.stone_button, 'I', ingotIron));
-            ThermalExpansionHelper.addTransposerFill(16000, itemTessEmpty, itemTessFull, fluidEnder, false);
+            ThermalExpansionHelper.addTransposerFill(16000, itemTessEmpty, itemTessFull, MetaItemGetter.fluidEnder, false);
         }
 
         if (Loader.isModLoaded("EnderIO"))

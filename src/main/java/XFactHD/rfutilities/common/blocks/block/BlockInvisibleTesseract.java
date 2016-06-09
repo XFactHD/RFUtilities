@@ -96,8 +96,9 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
 
             if(equipped != null && equipped.getItem() instanceof ItemDialer)
             {
-                if (equipped.hasTagCompound())
+                if (equipped.hasTagCompound() && equipped.getTagCompound().hasKey("senderX"))
                 {
+                    int dim = equipped.stackTagCompound.getInteger("dimension");
                     int senderX = equipped.stackTagCompound.getInteger("senderX");
                     int senderY = equipped.stackTagCompound.getInteger("senderY");
                     int senderZ = equipped.stackTagCompound.getInteger("senderZ");
@@ -107,7 +108,7 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
                         tesseract.clearFrequency();
                         player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:clearedTess.name")));
                     }
-                    else
+                    else if (world.provider.dimensionId == dim)
                     {
                         TileEntity teTess = world.getTileEntity(senderX, senderY, senderZ);
                         if (teTess instanceof TileEntityInvisibleTesseract)
@@ -136,30 +137,38 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
                         else
                         {
                             player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:missingSender.name")));
-                            equipped.setTagCompound(null);
+                            NBTTagCompound compound = new NBTTagCompound();
+                            compound.setBoolean("modeDial", true);
+                            equipped.setTagCompound(compound);
                         }
                     }
-
+                    else
+                    {
+                        player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:otherDim.name")));
+                    }
                 }
                 else
                 {
-                    NBTTagCompound compound = new NBTTagCompound();
+                    int teDim = tesseract.getWorldObj().provider.dimensionId;
                     int teX = tesseract.xCoord;
                     int teY = tesseract.yCoord;
                     int teZ = tesseract.zCoord;
-                    compound.setInteger("senderX", teX);
-                    compound.setInteger("senderY", teY);
-                    compound.setInteger("senderZ", teZ);
-                    equipped.setTagCompound(compound);
+                    equipped.getTagCompound().setInteger("dimension", teDim);
+                    equipped.getTagCompound().setInteger("senderX", teX);
+                    equipped.getTagCompound().setInteger("senderY", teY);
+                    equipped.getTagCompound().setInteger("senderZ", teZ);
                     if (!tesseract.isActive)
                     {
                         tesseract.setActive(true);
                     }
-                    tesseract.setSender(true);
+                    if (!tesseract.isSender)
+                    {
+                        tesseract.setSender(true);
+                    }
                     player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:dialedToDialer.name")));
                 }
             }
-            else if (equipped != null && RFUtilities.TE_LOADED && equipped.getItem() instanceof ItemMultimeter)
+            else if (equipped != null && (RFUtilities.TE_LOADED && equipped.getItem() instanceof ItemMultimeter))
             {
                 if (!player.isSneaking())
                 {
@@ -184,10 +193,6 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
                     tesseract.hidden = !tesseract.hidden;
                     player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:hidden_" + Boolean.toString(tesseract.hidden) + ".name")));
                 }
-            }
-            else
-            {
-                //tesseract.clicked();
             }
         }
         return true;
@@ -270,6 +275,7 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ArrayList<ItemStack> dismantleBlock(EntityPlayer entityPlayer, World world, int x, int y, int z, boolean b)
     {

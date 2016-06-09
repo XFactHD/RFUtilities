@@ -36,6 +36,7 @@ public class ItemDialer extends ItemBaseRFU
         super("itemDialer", 1, 2, "Dialer");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b)
     {
@@ -75,6 +76,7 @@ public class ItemDialer extends ItemBaseRFU
         return stack;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List list)
     {

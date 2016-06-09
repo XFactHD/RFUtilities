@@ -37,7 +37,6 @@ public class BlockSwitch extends BlockBaseRFU
     public BlockSwitch()
     {
         super("blockSwitch", Material.iron, 1, ItemBlock.class, "");
-        //setCreativeTab(RFUtilities.creativeTab);
     }
 
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack stack)
@@ -68,7 +67,7 @@ public class BlockSwitch extends BlockBaseRFU
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float hitX, float hitY, float hitZ)
     {
-        if (player.getCurrentEquippedItem() == null || !(player.getCurrentEquippedItem().getItem() instanceof ItemWrench))
+        if (player.getCurrentEquippedItem() == null || (RFUtilities.TE_LOADED && !(player.getCurrentEquippedItem().getItem() instanceof ItemWrench)))
         {
             TileEntity te = world.getTileEntity(x, y, z);
             if (te instanceof TileEntitySwitch)

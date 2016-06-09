@@ -78,7 +78,6 @@ public class RenderInvisTesseract extends TileEntitySpecialRenderer
         GL11.glRotatef(180F, 0.0F, 0.0F, 1.0F);
 
         int rotation = 0;
-        //LogHelper.info(te.getBlockMetadata() + " " + te.getBlockMetadata() % 4);
         switch (te.getBlockMetadata())
         {
             case 0:
