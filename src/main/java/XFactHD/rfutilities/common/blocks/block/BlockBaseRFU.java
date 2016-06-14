@@ -51,6 +51,7 @@ public abstract class BlockBaseRFU extends BlockContainer implements IDismantlea
         this.name = name;
         this.icons = new IIcon[subNames.length][iconDimensions];
         this.iconDimensions = iconDimensions;
+        this.setHardness(5F);
         this.setBlockName(Reference.MOD_ID + ":" + name);
         GameRegistry.registerBlock(this, itemblock, name);
         this.setCreativeTab(RFUtilities.creativeTab);

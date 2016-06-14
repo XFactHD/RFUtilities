@@ -15,6 +15,7 @@
 
 package XFactHD.rfutilities.common.blocks.block;
 
+import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.blocks.itemBlock.ItemBlockRFCapacitor;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityCapacitor;
 import XFactHD.rfutilities.common.utils.LogHelper;
@@ -79,10 +80,9 @@ public class BlockCapacitor extends BlockBaseRFU
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float hitX, float hitY, float hitZ)
     {
         TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCapacitor && player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemMultimeter && !world.isRemote)
+        if (te instanceof TileEntityCapacitor && RFUtilities.TE_LOADED && player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemMultimeter && !world.isRemote)
         {
             player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("desc.rfutilities:stored.name") + " " + ((TileEntityCapacitor)te).getEnergyStored(ForgeDirection.UNKNOWN) + " " + StatCollector.translateToLocal("desc.rfutilities:rf.name") + " / " + ((TileEntityCapacitor)te).getMaxEnergyStored(ForgeDirection.UNKNOWN) + " " + StatCollector.translateToLocal("desc.rfutilities:rf.name")));
-            //LogHelper.info(((TileEntityCapacitor)world.getTileEntity(x, y, z)).type);
             return true;
         }
         return false;
