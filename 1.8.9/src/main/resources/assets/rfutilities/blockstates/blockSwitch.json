@@ -1,0 +1,17 @@
+{
+	"variants": {
+		"facing=north,status=false": { "model": "rfutilities:blockSwitchOff" },
+		"facing=north,status=true": { "model": "rfutilities:blockSwitchOn" },
+		
+		"facing=east,status=false": { "model": "rfutilities:blockSwitchOff", "y": 90},
+		"facing=east,status=true": { "model": "rfutilities:blockSwitchOn", "y": 90},
+		
+		"facing=south,status=false": { "model": "rfutilities:blockSwitchOff", "y": 180},
+		"facing=south,status=true": { "model": "rfutilities:blockSwitchOn", "y": 180},
+		
+		"facing=west,status=false": { "model": "rfutilities:blockSwitchOff", "y": 270},
+		"facing=west,status=true": { "model": "rfutilities:blockSwitchOn", "y": 270},
+		
+		"inventory": { "model": "rfutilities:blockSwitchOn" }
+	}
+}

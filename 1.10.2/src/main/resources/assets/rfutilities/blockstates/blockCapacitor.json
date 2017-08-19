@@ -1,0 +1,43 @@
+{
+	"variants":{
+		"facing=north,type=1": { "model": "rfutilities:blockCapacitor", "y": 180 },
+		"facing=north,type=2": { "model": "rfutilities:blockCapacitorHardened", "y": 180 },
+		"facing=north,type=3": { "model": "rfutilities:blockCapacitorReinforced", "y": 180 },
+		"facing=north,type=4": { "model": "rfutilities:blockCapacitorResonant", "y": 180 },
+		"facing=north,type=5": { "model": "rfutilities:blockCapacitorBasic", "y": 180 },
+		"facing=north,type=6": { "model": "rfutilities:blockCapacitorDouble", "y": 180 },
+		"facing=north,type=7": { "model": "rfutilities:blockCapacitorOctadic", "y": 180 },
+		
+		"facing=east,type=1": { "model": "rfutilities:blockCapacitor", "y": 270 },
+		"facing=east,type=2": { "model": "rfutilities:blockCapacitorHardened", "y": 270 },
+		"facing=east,type=3": { "model": "rfutilities:blockCapacitorReinforced", "y": 270 },
+		"facing=east,type=4": { "model": "rfutilities:blockCapacitorResonant", "y": 270 },
+		"facing=east,type=5": { "model": "rfutilities:blockCapacitorBasic", "y": 270 },
+		"facing=east,type=6": { "model": "rfutilities:blockCapacitorDouble", "y": 270 },
+		"facing=east,type=7": { "model": "rfutilities:blockCapacitorOctadic", "y": 270 },
+		
+		"facing=south,type=1": { "model": "rfutilities:blockCapacitor" },
+		"facing=south,type=2": { "model": "rfutilities:blockCapacitorHardened" },
+		"facing=south,type=3": { "model": "rfutilities:blockCapacitorReinforced" },
+		"facing=south,type=4": { "model": "rfutilities:blockCapacitorResonant" },
+		"facing=south,type=5": { "model": "rfutilities:blockCapacitorBasic" },
+		"facing=south,type=6": { "model": "rfutilities:blockCapacitorDouble" },
+		"facing=south,type=7": { "model": "rfutilities:blockCapacitorOctadic" },
+		
+		"facing=west,type=1": { "model": "rfutilities:blockCapacitor", "y": 90 },
+		"facing=west,type=2": { "model": "rfutilities:blockCapacitorHardened", "y": 90 },
+		"facing=west,type=3": { "model": "rfutilities:blockCapacitorReinforced", "y": 90 },
+		"facing=west,type=4": { "model": "rfutilities:blockCapacitorResonant", "y": 90 },
+		"facing=west,type=5": { "model": "rfutilities:blockCapacitorBasic", "y": 90 },
+		"facing=west,type=6": { "model": "rfutilities:blockCapacitorDouble", "y": 90 },
+		"facing=west,type=7": { "model": "rfutilities:blockCapacitorOctadic", "y": 90 },
+		
+		"inv1": { "model": "rfutilities:blockCapacitor" },
+		"inv2": { "model": "rfutilities:blockCapacitorHardened" },
+        "inv3": { "model": "rfutilities:blockCapacitorReinforced" },
+        "inv4": { "model": "rfutilities:blockCapacitorResonant" },
+        "inv5": { "model": "rfutilities:blockCapacitorBasic" },
+        "inv6": { "model": "rfutilities:blockCapacitorDouble" },
+        "inv7": { "model": "rfutilities:blockCapacitorOctadic" }
+	}
+}

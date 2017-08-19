@@ -1,0 +1,52 @@
+tile.rfutilities:blockSwitch.name=RF Switch
+tile.rfutilities:blockResistor.name=RF Resistor
+tile.rfutilities:blockCapacitor.name=RF Capacitor
+tile.rfutilities:blockInvisibleTesseract.name=Cloakable RF Tesseract
+tile.rfutilities:blockDiode.name=RF Diode
+tile.rfutilities:blockRFMeter.name=RF Meter
+tile.rfutilities:blockTransistor.name=RF Transistor
+
+item.rfutilities:itemMaterialTess.TessEmpty.name=Invisible Tesseract Frame (Empty)
+item.rfutilities:itemMaterialTess.TessFull.name=Invisible Tesseract Frame (Full)
+item.rfutilities:itemMaterialDisplay.Display.name=Display
+item.rfutilities:itemMaterial.HardenedGlassPane.name=Hardened Glass Pane
+item.rfutilities:itemDialer.Dialer.name=Tesseract Dialer
+
+desc.rfutilities:through.name=Current throughput:
+desc.rfutilities:stored.name=Currently stored:
+desc.rfutilities:rftick.name=RF/t
+desc.rfutilities:rf.name=RF
+desc.rfutilities:capType.name=Capacitor Type:
+desc.rfutilities:capType_1.name=TE Flux Compensator
+desc.rfutilities:capType_2.name=TE Hardened Flux Compensator
+desc.rfutilities:capType_3.name=TE Reinforced Flux Compensator
+desc.rfutilities:capType_4.name=TE Resonant Flux Compensator
+desc.rfutilities:capType_5.name=EnderIO Basic Capacitor
+desc.rfutilities:capType_6.name=EnderIO Double-Layer Capacitor
+desc.rfutilities:capType_7.name=EnderIO Vibrant Capacitor
+desc.rfutilities:noDep.name=Mod dependency not satisfied!!!
+desc.rfutilities:dialedTo.name=Dialed to:
+desc.rfutilities:nothing.name=Nothing
+desc.rfutilities:tessAt.name=Tesseract at
+desc.rfutilities:modeDial.name=Mode: Dial
+desc.rfutilities:modeClear.name=Mode: Clear
+
+chat.rfutilities:missingSender.name=The Tesseract this device is dialed with got removed! Clearing Dialer!
+chat.rfutilities:dialedToSender.name=Dial successful!
+chat.rfutilities:clearedTess.name=Reset Tesseract!
+chat.rfutilities:clearedDialer.name=Cleared Dialer!
+chat.rfutilities:undialed.name=This Tesseract isn't dialed to anything!
+chat.rfutilities:dialedToDialer.name=Successfully saved data to dialer!
+chat.rfutilities:cantDialSame.name=You can't dial a Tesseract to itself!
+chat.rfutilities:isSender.name=This Tesseract is a sender.
+chat.rfutilities:hidden_true.name=This Tesseract is now invisible.
+chat.rfutilities:hidden_false.name=This Tesseract is now visible.
+chat.rfutilities:alreadyDialed.name=Those Tesseracts are already dialed!
+
+guiDesc.rfutilities:accept.name=Accept
+guiDesc.rfutilities:decline.name=Decline
+
+itemGroup.rfutilities=RF Utilities
+
+key.cathegory.rfu.name=RF Utilities
+key.dialerModeChange.name=Dialer Mode Change

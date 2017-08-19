@@ -1,17 +1,23 @@
-*.class
-.mtj.tmp/
-*.jar
-*.war
-*.ear
-*.iml
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
 *.ipr
 *.iws
-*.rtf
-CoFH_at.cfg
-out/*
-libs/*
-eclipse/*
-build/*
+*.iml
+.idea
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+libs

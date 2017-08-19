@@ -1,0 +1,10 @@
+{
+	"variants": {
+		"facing=north": { "model":"rfutilities:blockDiode", "y": 180 },
+		"facing=east": { "model":"rfutilities:blockDiode", "y": 270 },
+		"facing=south": { "model":"rfutilities:blockDiode" },
+		"facing=west": { "model":"rfutilities:blockDiode", "y": 90 },
+	
+		"inventory": { "model":"rfutilities:blockDiode" }
+	}
+}
