@@ -5,7 +5,6 @@ bin
 .metadata
 .classpath
 .project
-CoFH_at.cfg
 
 # idea
 out
@@ -22,3 +21,7 @@ build
 eclipse
 run
 libs
+CoFH_at.cfg
+
+# Files from Forge MDK
+forge*changelog.txt
