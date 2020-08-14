@@ -15,7 +15,6 @@
 
 package XFactHD.rfutilities.common.items;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -23,7 +22,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -36,16 +34,15 @@ public class ItemDialer extends ItemBaseRFU
         super("itemDialer", 1, 2, "Dialer");
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b)
     {
         if (stack.hasTagCompound())
         {
-            String mode = stack.stackTagCompound.getBoolean("modeDial") ? StatCollector.translateToLocal("desc.rfutilities:modeDial.name") : StatCollector.translateToLocal("desc.rfutilities:modeClear.name");
+            String mode = stack.getTagCompound().getBoolean("modeDial") ? StatCollector.translateToLocal("desc.rfutilities:modeDial.name") : StatCollector.translateToLocal("desc.rfutilities:modeClear.name");
             list.add(mode);
 
-            if (stack.stackTagCompound.hasKey("senderX"))
+            if (stack.getTagCompound().hasKey("senderX"))
             {
                 int x = stack.getTagCompound().getInteger("senderX");
                 int y = stack.getTagCompound().getInteger("senderY");
@@ -65,7 +62,7 @@ public class ItemDialer extends ItemBaseRFU
     @Override
     public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player)
     {
-        if (!world.isRemote && player.isSneaking() && stack.stackTagCompound.getBoolean("modeDial"))
+        if (!world.isRemote && player.isSneaking() && stack.getTagCompound().getBoolean("modeDial"))
         {
             stack.setTagCompound(null);
             NBTTagCompound compound = new NBTTagCompound();
@@ -76,7 +73,6 @@ public class ItemDialer extends ItemBaseRFU
         return stack;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List list)
     {
@@ -85,25 +81,5 @@ public class ItemDialer extends ItemBaseRFU
         compound.setBoolean("modeDial", true);
         stack.setTagCompound(compound);
         list.add(stack);
-    }
-
-    @Override
-    public void registerIcons(IIconRegister iconRegister)
-    {
-        icons[0][0] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Dial
-        icons[0][1] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Clear
-    }
-
-    @Override
-    public IIcon getIcon(ItemStack stack, int pass)
-    {
-        if (stack.hasTagCompound())
-        {
-            return stack.stackTagCompound.getBoolean("modeDial") ? icons[0][0] : icons[0][1];
-        }
-        else
-        {
-            return icons[0][0];
-        }
     }
 }

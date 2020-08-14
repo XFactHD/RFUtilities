@@ -19,11 +19,13 @@ import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityInvisibleTesseract;
 import XFactHD.rfutilities.common.items.ItemDialer;
 import XFactHD.rfutilities.common.utils.EventHandler;
-import cofh.thermalexpansion.item.tool.ItemMultimeter;
+//import cofh.thermalexpansion.item.tool.ItemMultimeter;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -32,85 +34,113 @@ import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-
 public class BlockInvisibleTesseract extends BlockBaseRFU
 {
+    public static PropertyDirection facing = PropertyDirection.create("facing");
+
     public BlockInvisibleTesseract()
     {
-        super("blockInvisibleTesseract", Material.iron, 1, ItemBlock.class, "");
+        super("blockInvisibleTesseract", Material.iron, ItemBlock.class, "");
     }
 
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack stack)
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack stack)
     {
-        int l = MathHelper.floor_double((double) (entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-        int m = MathHelper.floor_double((double) (entityLivingBase.rotationPitch * 4.0F / 360.0F) + 0.5D) & 3;
-        //LogHelper.info(m);
+        int l = MathHelper.floor_double((double) (entity.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+        int m = MathHelper.floor_double((double) (entity.rotationPitch * 4.0F / 360.0F) + 0.5D) & 3;
 
         if (m == 1)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.DOWN), 2);
         }
         else if (m == 3)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 1, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.UP), 2);
         }
         else if (m == 0)
         {
             if (l == 0)
             {
-                world.setBlockMetadataWithNotify(x, y, z, 5, 2);
+                world.setBlockState(pos, state.withProperty(facing, EnumFacing.SOUTH), 2);
             }
 
             if (l == 1)
             {
-                world.setBlockMetadataWithNotify(x, y, z, 2, 2);
+                world.setBlockState(pos, state.withProperty(facing, EnumFacing.WEST), 2);
             }
 
             if (l == 2)
             {
-                world.setBlockMetadataWithNotify(x, y, z, 3, 2);
+                world.setBlockState(pos, state.withProperty(facing, EnumFacing.NORTH), 2);
             }
 
             if (l == 3)
             {
-                world.setBlockMetadataWithNotify(x, y, z, 4, 2);
+                world.setBlockState(pos, state.withProperty(facing, EnumFacing.EAST), 2);
             }
         }
-        //LogHelper.info("Meta: " + world.getBlockMetadata(x, y, z) + ", l: " + l + ", m: " + m);
     }
 
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player)
+    protected BlockState createBlockState()
+    {
+        return new BlockState(this, facing);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta)
+    {
+        EnumFacing f;
+        switch (meta)
+        {
+            case 0: f = EnumFacing.DOWN; break;
+            case 1: f = EnumFacing.UP; break;
+            case 2: f = EnumFacing.NORTH; break;
+            case 3: f = EnumFacing.SOUTH; break;
+            case 4: f = EnumFacing.WEST; break;
+            case 5: f = EnumFacing.EAST; break;
+            default: return super.getStateFromMeta(meta);
+        }
+        return getDefaultState().withProperty(facing, f);
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state)
+    {
+        EnumFacing f = state.getValue(facing);
+        return f.getIndex();
+    }
+
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player)
     {
         return new ItemStack(this, 1, 0);
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         if (!world.isRemote)
         {
-            TileEntityInvisibleTesseract tesseract = ((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z));
+            TileEntityInvisibleTesseract tesseract = ((TileEntityInvisibleTesseract)world.getTileEntity(pos));
             ItemStack equipped = player.getCurrentEquippedItem();
 
             if(equipped != null && equipped.getItem() instanceof ItemDialer)
             {
-                if (equipped.hasTagCompound() && equipped.getTagCompound().hasKey("senderX"))
+                if (equipped.hasTagCompound())
                 {
-                    int dim = equipped.stackTagCompound.getInteger("dimension");
-                    int senderX = equipped.stackTagCompound.getInteger("senderX");
-                    int senderY = equipped.stackTagCompound.getInteger("senderY");
-                    int senderZ = equipped.stackTagCompound.getInteger("senderZ");
+                    int senderX = equipped.getTagCompound().getInteger("senderX");
+                    int senderY = equipped.getTagCompound().getInteger("senderY");
+                    int senderZ = equipped.getTagCompound().getInteger("senderZ");
 
-                    if (!equipped.stackTagCompound.getBoolean("modeDial"))
+                    if (!equipped.getTagCompound().getBoolean("modeDial"))
                     {
                         tesseract.clearFrequency();
                         player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:clearedTess.name")));
                     }
-                    else if (world.provider.dimensionId == dim)
+                    else
                     {
-                        TileEntity teTess = world.getTileEntity(senderX, senderY, senderZ);
+                        TileEntity teTess = world.getTileEntity(new BlockPos(senderX, senderY, senderZ));
                         if (teTess instanceof TileEntityInvisibleTesseract)
                         {
                             TileEntityInvisibleTesseract sender = ((TileEntityInvisibleTesseract)teTess);
@@ -137,38 +167,30 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
                         else
                         {
                             player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:missingSender.name")));
-                            NBTTagCompound compound = new NBTTagCompound();
-                            compound.setBoolean("modeDial", true);
-                            equipped.setTagCompound(compound);
+                            equipped.setTagCompound(null);
                         }
                     }
-                    else
-                    {
-                        player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:otherDim.name")));
-                    }
+
                 }
                 else
                 {
-                    int teDim = tesseract.getWorldObj().provider.dimensionId;
-                    int teX = tesseract.xCoord;
-                    int teY = tesseract.yCoord;
-                    int teZ = tesseract.zCoord;
-                    equipped.getTagCompound().setInteger("dimension", teDim);
-                    equipped.getTagCompound().setInteger("senderX", teX);
-                    equipped.getTagCompound().setInteger("senderY", teY);
-                    equipped.getTagCompound().setInteger("senderZ", teZ);
+                    NBTTagCompound compound = new NBTTagCompound();
+                    int teX = tesseract.getPos().getX();
+                    int teY = tesseract.getPos().getY();
+                    int teZ = tesseract.getPos().getZ();
+                    compound.setInteger("senderX", teX);
+                    compound.setInteger("senderY", teY);
+                    compound.setInteger("senderZ", teZ);
+                    equipped.setTagCompound(compound);
                     if (!tesseract.isActive)
                     {
                         tesseract.setActive(true);
                     }
-                    if (!tesseract.isSender)
-                    {
-                        tesseract.setSender(true);
-                    }
+                    tesseract.setSender(true);
                     player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:dialedToDialer.name")));
                 }
             }
-            else if (equipped != null && (RFUtilities.TE_LOADED && equipped.getItem() instanceof ItemMultimeter))
+            else if (equipped != null && RFUtilities.TE_LOADED /*&& equipped.getItem() instanceof ItemMultimeter*/)
             {
                 if (!player.isSneaking())
                 {
@@ -178,9 +200,9 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
                     }
                     else if (tesseract.isActive)
                     {
-                        int dialedX = tesseract.dialedSender.xCoord;
-                        int dialedY = tesseract.dialedSender.yCoord;
-                        int dialedZ = tesseract.dialedSender.zCoord;
+                        int dialedX = tesseract.dialedSender.getPos().getX();
+                        int dialedY = tesseract.dialedSender.getPos().getY();
+                        int dialedZ = tesseract.dialedSender.getPos().getZ();
                         player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("desc.rfutilities:dialedTo.name") + " " + StatCollector.translateToLocal("desc.rfutilities:tessAt.name") + " X=" + dialedX + ", Y=" + dialedY + ", Z=" + dialedZ + "."));
                     }
                     else
@@ -194,24 +216,28 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
                     player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:hidden_" + Boolean.toString(tesseract.hidden) + ".name")));
                 }
             }
+            else
+            {
+                //tesseract.clicked();
+            }
         }
         return true;
     }
 
     @Override
-    public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z)
+    public void setBlockBoundsBasedOnState(IBlockAccess world, BlockPos pos)
     {
-        if (EventHandler.canItemShowTess || (world.getTileEntity(x, y, z) instanceof TileEntityInvisibleTesseract  && !((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z)).hidden))
+        if (EventHandler.canItemShowTess || (world.getTileEntity(pos) instanceof TileEntityInvisibleTesseract  && !((TileEntityInvisibleTesseract)world.getTileEntity(pos)).hidden))
         {
-            switch (world.getBlockMetadata(x, y, z))
+            switch (world.getBlockState(pos).getValue(facing))
             {
-                case 0: setBlockBounds(0F, .14F, .14F, .19F, .86F, .86F);
-                case 1: setBlockBounds(0F, .14F, .14F, .19F, .86F, .86F);
-                case 2: setBlockBounds(0F, .14F, .14F, .19F, .86F, .86F);
-                case 3: setBlockBounds(.14F, .14F, 0F, .86F, .86F, .19F);
-                case 4: setBlockBounds(1F, .14F, .86F, .81F, .86F, .14F);
-                case 5: setBlockBounds(.14F, .14F, .81F, .86F, .86F, 1F);
-                default: setBlockBounds(0F, 0F, 0F, 1F, 1F, 1F);
+                case DOWN:  setBlockBounds(.13F,   0F, .13F, .87F, .19F, .87F);
+                case UP:    setBlockBounds(.13F, .81F, .13F, .87F,   1F, .87F);
+                case NORTH: setBlockBounds(.14F, .14F,   0F, .86F, .86F, .19F);
+                case SOUTH: setBlockBounds(.14F, .14F, .81F, .86F, .86F,   1F);
+                case WEST:  setBlockBounds(  0F, .14F, .14F, .19F, .86F, .86F);
+                case EAST:  setBlockBounds(  1F, .14F, .86F, .81F, .86F, .14F);
+                default:    setBlockBounds(  0F,   0F,   0F,   1F,   1F,   1F);
             }
         }
         else
@@ -221,19 +247,22 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z)
+    public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos pos, IBlockState state)
     {
-        if (EventHandler.canItemShowTess || (world.getTileEntity(x, y, z) instanceof TileEntityInvisibleTesseract  && !((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z)).hidden))
+        if (EventHandler.canItemShowTess || (world.getTileEntity(pos) instanceof TileEntityInvisibleTesseract  && !((TileEntityInvisibleTesseract)world.getTileEntity(pos)).hidden))
         {
-            switch (world.getBlockMetadata(x, y, z))
+            int x = pos.getX();
+            int y = pos.getY();
+            int z = pos.getZ();
+            switch (world.getBlockState(pos).getValue(facing))
             {
-                case 0: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y, (double)z+.13D, (double)x+.87D, (double)y+.19D, (double)z+.87D);
-                case 1: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y+.81D, (double)z+.13D, (double)x+.87D, (double)y+1D, (double)z+.87D);
-                case 2: return AxisAlignedBB.getBoundingBox((double)x, (double)y+.14D, (double)z+.14D, (double)x+.19D, (double)y+.86D, (double)z+.86D);
-                case 3: return AxisAlignedBB.getBoundingBox((double)x+.14D, (double)y+.14D, (double)z, (double)x+.86D, (double)y+.86D, (double)z+.19D);
-                case 4: return AxisAlignedBB.getBoundingBox((double)x+1, (double)y+.14D, (double)z+.86D, (double)x+.81D, (double)y+.86D, (double)z+.14D);
-                case 5: return AxisAlignedBB.getBoundingBox((double)x+.14D, (double)y+.14D, (double)z+.81D, (double)x+.86D, (double)y+.86D, (double)z+1);
-                default: return AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)x+1, (double)y+1, (double)z+1);
+                case DOWN:  return AxisAlignedBB.fromBounds((double)x+.13D, (double)y,      (double)z+.13D, (double)x+.87D, (double)y+.19D, (double)z+.87D);
+                case UP:    return AxisAlignedBB.fromBounds((double)x+.13D, (double)y+.81D, (double)z+.13D, (double)x+.87D, (double)y+1D,   (double)z+.87D);
+                case NORTH: return AxisAlignedBB.fromBounds((double)x+.14D, (double)y+.14D, (double)z,      (double)x+.86D, (double)y+.86D, (double)z+.19D);
+                case SOUTH: return AxisAlignedBB.fromBounds((double)x+.14D, (double)y+.14D, (double)z+.81D, (double)x+.86D, (double)y+.86D, (double)z+1);
+                case WEST:  return AxisAlignedBB.fromBounds((double)x,      (double)y+.14D, (double)z+.14D, (double)x+.19D, (double)y+.86D, (double)z+.86D);
+                case EAST:  return AxisAlignedBB.fromBounds((double)x+1,    (double)y+.14D, (double)z+.86D, (double)x+.81D, (double)y+.86D, (double)z+.14D);
+                default:    return AxisAlignedBB.fromBounds((double)x,      (double)y,      (double)z,      (double)x+1,    (double)y+1,    (double)z+1);
             }
         }
         else
@@ -243,24 +272,27 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
     }
 
     @Override
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z)
+    public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos pos)
     {
-        switch (world.getBlockMetadata(x, y, z))
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        switch (world.getBlockState(pos).getValue(facing))
         {
-            case 0: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y,      (double)z+.13D, (double)x+.87D, (double)y+.19D, (double)z+.87D);
-            case 1: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y+.81D, (double)z+.13D, (double)x+.87D, (double)y  +1D, (double)z+.87D);
-            case 2: return AxisAlignedBB.getBoundingBox((double)x, (double)y+.13D, (double)z+.13D, (double)x+.2D, (double)y+.87D, (double)z+.87D);
-            case 3: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y+.13D, (double)z, (double)x+.87D, (double)y+.87D, (double)z+.2D);
-            case 4: return AxisAlignedBB.getBoundingBox((double)x+1, (double)y+.13D, (double)z+.87D, (double)x+.8D, (double)y+.87D, (double)z+.13D);
-            case 5: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y+.13D, (double)z+.8D, (double)x+.87D, (double)y+.87D, (double)z+1);
-            default: return AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)x+1, (double)y+1, (double)z+1);
+            case DOWN:  return AxisAlignedBB.fromBounds((double)x+.13D, (double)y,      (double)z+.13D, (double)x+.87D, (double)y+.19D, (double)z+.87D);
+            case UP:    return AxisAlignedBB.fromBounds((double)x+.13D, (double)y+.81D, (double)z+.13D, (double)x+.87D, (double)y+1D,   (double)z+.87D);
+            case NORTH: return AxisAlignedBB.fromBounds((double)x+.13D, (double)y+.13D, (double)z,      (double)x+.87D, (double)y+.87D, (double)z+.2D);
+            case SOUTH: return AxisAlignedBB.fromBounds((double)x+.13D, (double)y+.13D, (double)z+.81D, (double)x+.87D, (double)y+.87D, (double)z+1);
+            case WEST:  return AxisAlignedBB.fromBounds((double)x,      (double)y+.13D, (double)z+.13D, (double)x+.2D,  (double)y+.87D, (double)z+.87D);
+            case EAST:  return AxisAlignedBB.fromBounds((double)x+1,    (double)y+.13D, (double)z+.87D, (double)x+.8D,  (double)y+.87D, (double)z+.13D);
+            default:    return AxisAlignedBB.fromBounds((double)x,      (double)y,      (double)z,      (double)x+1,    (double)y+1,    (double)z+1);
         }
     }
 
     @Override
-    public MovingObjectPosition collisionRayTrace(World world, int x, int y, int z, Vec3 startVec, Vec3 endVec)
+    public MovingObjectPosition collisionRayTrace(World world, BlockPos pos, Vec3 startVec, Vec3 endVec)
     {
-        return super.collisionRayTrace(world, x, y, z, startVec, endVec);
+        return super.collisionRayTrace(world, pos, startVec, endVec);
     }
 
     @Override
@@ -270,25 +302,9 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
     }
 
     @Override
-    public boolean canDismantle(EntityPlayer entityPlayer, World world, int x, int y, int z)
-    {
-        return true;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public ArrayList<ItemStack> dismantleBlock(EntityPlayer entityPlayer, World world, int x, int y, int z, boolean b)
-    {
-        ItemStack stack = new ItemStack(Item.getItemFromBlock(new BlockInvisibleTesseract()));
-        ArrayList list = new ArrayList<ItemStack>();
-        list.add(stack);
-        return list;
-    }
-
-    @Override
     public int getRenderType()
 {
-    return -1;
+    return 3;
 }
 
     @Override
@@ -297,7 +313,8 @@ public class BlockInvisibleTesseract extends BlockBaseRFU
         return false;
     }
 
-    public boolean renderAsNormalBlock()
+    @Override
+    public boolean isFullCube()
     {
         return false;
     }

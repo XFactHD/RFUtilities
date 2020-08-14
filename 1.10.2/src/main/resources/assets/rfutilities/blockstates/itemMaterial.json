@@ -1,9 +1,0 @@
-{
-    "variants": {
-        "hardenedglasspane": { "model": "rfutilities:item/itemHardenedGlassPane" },
-        "tessempty":         { "model": "rfutilities:item/itemTessEmpty" },
-        "tessfull":          { "model": "rfutilities:item/itemTessFull" },
-        "redstonecircuit":   { "model": "rfutilities:item/itemRedstoneCircuit" },
-        "display":           { "model": "rfutilities:item/itemDisplay" }
-    }
-}

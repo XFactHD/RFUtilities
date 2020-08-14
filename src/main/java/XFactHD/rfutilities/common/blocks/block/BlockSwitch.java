@@ -15,65 +15,113 @@
 
 package XFactHD.rfutilities.common.blocks.block;
 
-import XFactHD.rfutilities.RFUtilities;
-import XFactHD.rfutilities.client.models.ModelSwitch;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntitySwitch;
-import XFactHD.rfutilities.common.utils.LogHelper;
-import XFactHD.rfutilities.common.utils.Reference;
-import cofh.thermalexpansion.item.tool.ItemWrench;
+//import cofh.thermalexpansion.item.tool.ItemWrench;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
+import java.util.Arrays;
 
 public class BlockSwitch extends BlockBaseRFU
 {
+    public static PropertyDirection facing = PropertyDirection.create("facing", Arrays.asList(EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH, EnumFacing.WEST));
+    private static PropertyBool status = PropertyBool.create("status");
+
     public BlockSwitch()
     {
-        super("blockSwitch", Material.iron, 1, ItemBlock.class, "");
+        super("blockSwitch", Material.iron, ItemBlock.class, "");
     }
 
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack stack)
+    @Override
+    protected BlockState createBlockState()
+    {
+        return new BlockState(this, facing, status);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta)
+    {
+        EnumFacing f;
+        switch (meta)
+        {
+            case 0: f = EnumFacing.NORTH; break;
+            case 1: f = EnumFacing.SOUTH; break;
+            case 2: f = EnumFacing.WEST; break;
+            case 3: f = EnumFacing.EAST; break;
+            default: return super.getStateFromMeta(meta);
+        }
+        return getDefaultState().withProperty(facing, f);
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state)
+    {
+        return state.getValue(facing).getIndex();
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos)
+    {
+        EnumFacing dir = state.getValue(facing);
+        TileEntity te = world.getTileEntity(pos);
+        boolean on = false;
+        if (te instanceof TileEntitySwitch)
+        {
+            on = ((TileEntitySwitch)te).getIsOn();
+        }
+        return state.withProperty(facing, dir).withProperty(status, on);
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entityLivingBase, ItemStack stack)
     {
         int l = MathHelper.floor_double((double) (entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 
         if (l == 0)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 5, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.NORTH), 2);
         }
 
         if (l == 1)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 2, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.EAST), 2);
         }
 
         if (l == 2)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 3, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.SOUTH), 2);
         }
 
         if (l == 3)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 4, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.WEST), 2);
         }
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        if (player.getCurrentEquippedItem() == null || (RFUtilities.TE_LOADED && !(player.getCurrentEquippedItem().getItem() instanceof ItemWrench)))
+        if (player.getCurrentEquippedItem() == null /*|| !(player.getCurrentEquippedItem().getItem() instanceof ItemWrench)*/)
         {
-            TileEntity te = world.getTileEntity(x, y, z);
+            TileEntity te = world.getTileEntity(pos);
             if (te instanceof TileEntitySwitch)
             {
-                ((TileEntitySwitch)te).isOn = !((TileEntitySwitch)te).isOn;
-                world.markBlockForUpdate(x, y, z);
+                ((TileEntitySwitch)te).setIsOn(!((TileEntitySwitch)te).getIsOn());
+                world.markBlockForUpdate(pos);
+                world.playSoundAtEntity(player, "random.click", 0.3F, ((TileEntitySwitch)te).getIsOn() ? 0.6F : 0.5F);
             }
         }
         return true;
@@ -83,22 +131,5 @@ public class BlockSwitch extends BlockBaseRFU
     public TileEntity createNewTileEntity(World world, int meta)
     {
         return new TileEntitySwitch();
-    }
-
-    @Override
-    public int getRenderType()
-    {
-        return -1;
-    }
-
-    @Override
-    public boolean isOpaqueCube()
-    {
-        return false;
-    }
-
-    public boolean renderAsNormalBlock()
-    {
-        return false;
     }
 }

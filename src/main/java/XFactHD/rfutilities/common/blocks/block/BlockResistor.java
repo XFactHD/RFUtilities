@@ -17,61 +17,91 @@ package XFactHD.rfutilities.common.blocks.block;
 
 import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityResistor;
-import XFactHD.rfutilities.common.utils.LogHelper;
 import XFactHD.rfutilities.common.utils.Reference;
-import cofh.thermalexpansion.item.tool.ItemMultimeter;
+//import cofh.thermalexpansion.item.tool.ItemMultimeter;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
+
+import java.util.Arrays;
 
 public class BlockResistor extends BlockBaseRFU
 {
+    public static PropertyDirection facing = PropertyDirection.create("facing", Arrays.asList(EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH, EnumFacing.WEST));
+
     public BlockResistor()
     {
-        super("blockResistor", Material.iron, 1, ItemBlock.class, "");
+        super("blockResistor", Material.iron, ItemBlock.class, "");
         //setCreativeTab(RFUtilities.creativeTab);
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack stack)
+    protected BlockState createBlockState()
+    {
+        return new BlockState(this, new IProperty[]{facing});
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta)
+    {
+        EnumFacing f;
+        switch (meta)
+        {
+            case 0: f = EnumFacing.NORTH; break;
+            case 1: f = EnumFacing.SOUTH; break;
+            case 2: f = EnumFacing.WEST; break;
+            case 3: f = EnumFacing.EAST; break;
+            default: return super.getStateFromMeta(meta);
+        }
+        return getDefaultState().withProperty(facing, f);
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state)
+    {
+        return state.getValue(facing).getIndex();
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entityLivingBase, ItemStack stack)
     {
         int l = MathHelper.floor_double((double) (entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 
         if (l == 0)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 5, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.NORTH), 2);
         }
 
         if (l == 1)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 2, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.EAST), 2);
         }
 
         if (l == 2)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 3, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.SOUTH), 2);
         }
 
         if (l == 3)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 4, 2);
+            world.setBlockState(pos, state.withProperty(facing, EnumFacing.WEST), 2);
         }
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityResistor && RFUtilities.TE_LOADED && player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemMultimeter && !world.isRemote)
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof TileEntityResistor /*&& player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemMultimeter*/ && !world.isRemote)
         {
             player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("desc.rfutilities:through.name") + " " + ((TileEntityResistor)te).throughput + " " + StatCollector.translateToLocal("desc.rfutilities:rftick.name")));
             return true;
@@ -80,7 +110,7 @@ public class BlockResistor extends BlockBaseRFU
         {
             if (!world.isRemote)
             {
-                player.openGui(RFUtilities.instance, Reference.GUI_ID_RES, world, x, y, z);
+                player.openGui(RFUtilities.instance, Reference.GUI_ID_RES, world, pos.getX(), pos.getY(), pos.getZ());
             }
 
         }
@@ -96,17 +126,11 @@ public class BlockResistor extends BlockBaseRFU
     @Override
     public int getRenderType()
     {
-        return -1;
+        return 3;
     }
 
     @Override
     public boolean isOpaqueCube()
-    {
-        return false;
-    }
-
-    @Override
-    public boolean renderAsNormalBlock()
     {
         return false;
     }

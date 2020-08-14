@@ -17,51 +17,44 @@ package XFactHD.rfutilities.common.blocks.block;
 
 import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.utils.Reference;
-import cofh.api.block.IDismantleable;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BlockBaseRFU extends BlockContainer implements IDismantleable
+public abstract class BlockBaseRFU extends Block implements ITileEntityProvider
 {
     public String name;
-    public String[] subNames;
-    public final IIcon[][] icons;
-    protected final int iconDimensions;
+    private String[] subNames;
 
-    public BlockBaseRFU(String name, Material mat, int iconDimensions, Class<? extends ItemBlock> itemblock, String... subNames)
+    BlockBaseRFU(String name, Material mat, Class<? extends ItemBlock> itemblock, String... subNames)
     {
         super(mat);
         this.subNames = subNames;
         this.name = name;
-        this.icons = new IIcon[subNames.length][iconDimensions];
-        this.iconDimensions = iconDimensions;
-        this.setHardness(5F);
-        this.setBlockName(Reference.MOD_ID + ":" + name);
+        this.setRegistryName(name);
+        this.setUnlocalizedName(Reference.MOD_ID + ":" + name);
         GameRegistry.registerBlock(this, itemblock, name);
         this.setCreativeTab(RFUtilities.creativeTab);
     }
 
     @Override
-    public int damageDropped(int meta)
+    public int damageDropped(IBlockState state)
     {
-        return meta;
+        return 0;
     }
+
+    @SuppressWarnings("unchecked")
     @Override
     public void getSubBlocks(Item item, CreativeTabs tab, List list)
     {
@@ -72,51 +65,20 @@ public abstract class BlockBaseRFU extends BlockContainer implements IDismantlea
     }
 
     @Override
-    public void registerBlockIcons(IIconRegister iconRegister)
-    {
-        for(int i=0;i<subNames.length;i++)
-            icons[i][0] = iconRegister.registerIcon(Reference.MOD_ID + ":" + name + "_" + subNames[i]);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(int side, int meta)
-    {
-        if(meta<icons.length)
-        {
-            return icons[meta][getSideForTexture(side)];
-        }
-        return null;
-    }
-
-    protected int getSideForTexture(int side)
-    {
-        if(iconDimensions==2)
-        {
-            return side==0||side==1?0: 1;
-        }
-        if(iconDimensions==4)
-        {
-            return side<2?side: side==2||side==3?2: 3;
-        }
-        return Math.min(side, iconDimensions-1);
-    }
-
-    @Override
-    public boolean canCreatureSpawn(EnumCreatureType type, IBlockAccess world, int x, int y, int z)
+    public boolean canCreatureSpawn(IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type)
     {
         return false;
     }
 
     @Override
-    public boolean canDismantle(EntityPlayer entityPlayer, World world, int i, int i1, int i2)
+    public boolean isOpaqueCube()
     {
         return false;
     }
 
     @Override
-    public ArrayList<ItemStack> dismantleBlock(EntityPlayer entityPlayer, World world, int x, int y, int z, boolean b)
+    public int getLightOpacity()
     {
-        return null;
+        return 0;
     }
 }

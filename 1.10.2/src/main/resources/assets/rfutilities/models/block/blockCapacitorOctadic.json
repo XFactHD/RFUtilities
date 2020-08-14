@@ -1,6 +1,0 @@
-{
-	"parent": "rfutilities:block/blockCapacitor",
-    "textures": {
-        "1": "rfutilities:blocks/capacitorOctadic"
-    }
-}

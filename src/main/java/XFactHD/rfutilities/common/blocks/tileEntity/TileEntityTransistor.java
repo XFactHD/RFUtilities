@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD, DrakoAlcarus>
+/*  Copyright (C) <2015>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,38 +15,41 @@
 
 package XFactHD.rfutilities.common.blocks.tileEntity;
 
-import cofh.api.energy.IEnergyHandler;
+import XFactHD.rfutilities.common.blocks.block.BlockTransistor;
+import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
-import cpw.mods.fml.common.Optional;
-import li.cil.oc.api.machine.Arguments;
-import li.cil.oc.api.machine.Context;
-import li.cil.oc.api.network.ManagedPeripheral;
-import li.cil.oc.api.network.SidedComponent;
-import li.cil.oc.api.network.SimpleComponent;
+import net.minecraftforge.fml.common.Optional;
+//import li.cil.oc.api.machine.Arguments;
+//import li.cil.oc.api.machine.Context;
+//import li.cil.oc.api.network.ManagedPeripheral;
+//import li.cil.oc.api.network.SidedComponent;
+//import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 
 @Optional.InterfaceList
         ({
                 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers", striprefs = true),
-                @Optional.Interface(iface = "li.cil.oc.api.network.ManagedPeripheral", modid = "OpenComputers", striprefs = true),
-                @Optional.Interface(iface = "li.cil.oc.api.network.SidedComponent", modid = "OpenComputers", striprefs = true)
+                @Optional.Interface(iface = "li.cil.oc.api.network.SidedComponent", modid = "OpenComputers", striprefs = true),
+                @Optional.Interface(iface = "li.cil.oc.api.network.ManagedPeripheral", modid = "OpenComputers", striprefs = true)
         })
-public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyHandler, SimpleComponent, SidedComponent, ManagedPeripheral
+public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyReceiver, IEnergyProvider, ITickable//, SimpleComponent, SidedComponent, ManagedPeripheral
 {
     private boolean isOn = false;
-    private String mode = "rs";
-    private String[] methods = new String[]{"setActive", "getActive", "setMode", "getMode"};
+    private int cooldown = 0;
+    private String[] methods = new String[]{"setActive", "getActive"};
 
-    public boolean canConnectRedstone(ForgeDirection fd)
+    private boolean canConnectRedstone(EnumFacing facing)
     {
-        switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
+        switch (worldObj.getBlockState(pos).getValue(BlockTransistor.facing).getIndex())
         {
-            case 2: return (fd == ForgeDirection.WEST);
-            case 3: return (fd == ForgeDirection.NORTH);
-            case 4: return (fd == ForgeDirection.EAST);
-            case 5: return (fd == ForgeDirection.SOUTH);
+            case 2: return (facing == EnumFacing.WEST);
+            case 3: return (facing == EnumFacing.NORTH);
+            case 4: return (facing == EnumFacing.EAST);
+            case 5: return (facing == EnumFacing.SOUTH);
             default: return false;
         }
     }
@@ -58,77 +61,71 @@ public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyHa
 
     private void setIsOn(boolean on)
     {
-        isOn = on;
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        if (on != isOn && cooldown == 0)
+        {
+            isOn = on;
+            this.cooldown = 5;
+            worldObj.markBlockForUpdate(pos);
+        }
     }
 
     private Object[] call(String method, Object argument)
     {
         if ("setActive".equals(method) && argument instanceof Boolean)
         {
-            setIsOn((Boolean)argument);
+            setIsOn(((Boolean)argument));
             return new Object[]{null};
         }
         else if ("getActive".equals(method))
         {
             return new Object[]{getIsOn()};
         }
-        else if ("setMode".equals(method) && argument instanceof String && ("rs".equals(argument) || "oc".equals(argument)))
-        {
-            setMode((String)argument);
-            return new Object[]{null};
-        }
-        else if ("getMode".equals(method))
-        {
-            return new Object[]{getMode()};
-        }
-        return new Object[]{"Throw!"};
-    }
-
-    private void setMode(String mode)
-    {
-        this.mode = mode;
-    }
-
-    private String getMode()
-    {
-        return mode;
+        return new Object[]{null};
     }
 
     @Override
-    public void updateEntity()
+    public void update()
     {
-        super.updateEntity();
-        boolean on = isOn;
-        boolean redstone = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
-        if ("rs".equals(getMode()) && on != redstone)
+        if (cooldown > 0)
         {
-            setIsOn(redstone);
+            --this.cooldown;
         }
+        EnumFacing facing = EnumFacing.UP;
+        for (int i = 2; i < 6; i++)
+        {
+            if (canConnectRedstone(EnumFacing.getFront(i)))
+            {
+                facing = EnumFacing.getFront(i);
+                break;
+            }
+        }
+        boolean redstone = worldObj.isSidePowered(pos, facing);
+        setIsOn(redstone);
     }
 
     //IEnergyHandler
     @Override
-    public boolean canConnectEnergy(ForgeDirection fd)
+    public boolean canConnectEnergy(EnumFacing facing)
     {
-        switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
+        switch (worldObj.getBlockState(pos).getValue(BlockTransistor.facing).getIndex())
         {
-            case 2: return (fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH);
-            case 3: return (fd == ForgeDirection.EAST || fd == ForgeDirection.WEST);
-            case 4: return (fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH);
-            case 5: return (fd == ForgeDirection.EAST || fd == ForgeDirection.WEST);
+            case 2: return (facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH);
+            case 3: return (facing == EnumFacing.EAST  || facing == EnumFacing.WEST);
+            case 4: return (facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH);
+            case 5: return (facing == EnumFacing.EAST  || facing == EnumFacing.WEST);
             default: return false;
         }
     }
 
     @Override
-    public int receiveEnergy(ForgeDirection fd, int amount, boolean simulate)
+    public int receiveEnergy(EnumFacing facing, int amount, boolean simulate)
     {
-        ForgeDirection opposite = fd.getOpposite();
-        TileEntity te = worldObj.getTileEntity(xCoord + opposite.offsetX, yCoord, zCoord + opposite.offsetZ);
-        if (canConnectEnergy(fd) && te instanceof IEnergyReceiver && (((IEnergyReceiver)te).receiveEnergy(fd, amount, true) > 0) && isOn)
+        EnumFacing opposite = facing.getOpposite();
+        BlockPos tePos = new BlockPos(pos.getX() + opposite.getFrontOffsetX(), pos.getY(), pos.getZ() + opposite.getFrontOffsetZ());
+        TileEntity te = worldObj.getTileEntity(tePos);
+        if (canConnectEnergy(facing) && te instanceof IEnergyReceiver && (((IEnergyReceiver)te).receiveEnergy(facing, amount, true) > 0) && isOn)
         {
-            return ((IEnergyReceiver)te).receiveEnergy(fd, amount, simulate);
+            return ((IEnergyReceiver)te).receiveEnergy(facing, amount, simulate);
         }
         else
         {
@@ -137,59 +134,54 @@ public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyHa
     }
 
     @Override
-    public int extractEnergy(ForgeDirection fd, int amount, boolean simulate)
+    public int extractEnergy(EnumFacing facing, int amount, boolean simulate)
     {
         return 0;
     }
 
     @Override
-    public int getEnergyStored(ForgeDirection fd)
+    public int getEnergyStored(EnumFacing facing)
     {
         return 0;
     }
 
     @Override
-    public int getMaxEnergyStored(ForgeDirection fd)
+    public int getMaxEnergyStored(EnumFacing facing)
     {
         return 0;
     }
 
     //OpenComputers
-    @Optional.Method(modid = "OpenComputers")
-    @Override
-    public String getComponentName()
-    {
-        return "rfu_transistor";
-    }
+    //@Optional.Method(modid = "OpenComputers")
+    //@Override
+    //public String getComponentName()
+    //{
+    //    return "rfu_transistor";
+    //}
 
-    @Override
-    public boolean canConnectNode(ForgeDirection fd)
-    {
-        return canConnectRedstone(fd);
-    }
+    //@Override
+    //public boolean canConnectNode(EnumFacing side)
+    //{
+    //    return canConnectRedstone(side);
+    //}
 
-    @Optional.Method(modid = "OpenComputers")
-    @Override
-    public String[] methods()
-    {
-        return methods;
-    }
+    //@Optional.Method(modid = "OpenComputers")
+    //@Override
+    //public String[] methods()
+    //{
+    //    return methods;
+    //}
 
-    @Optional.Method(modid = "OpenComputers")
-    @Override
-    public Object[] invoke(String method, Context context, Arguments arguments) throws Exception
-    {
-        if (("setActive".equals(method) && arguments.count() == 1 && arguments.isBoolean(0)) || ("setMode".equals(method) && arguments.count() == 1 && arguments.isString(0)) || ("getActive".equals(method) && arguments.count() == 0) || ("getMode".equals(method) && arguments.count() == 0))
-        {
-            Object[] result = call(method, arguments.checkAny(0));
-            if (result[0] != null && result[0].equals("Throw!"))
-            {
-                throw new NoSuchMethodException("Wrong argument!");
-            }
-            return result;
-        }
-        throw new NoSuchMethodException("Wrong argument!");
-    }
+    //@Optional.Method(modid = "OpenComputers")
+    //@Override
+    //public Object[] invoke(String method, Context context, Arguments arguments) throws Exception
+    //{
+    //    if (("setActive".equals(method) && arguments.count() == 1 && arguments.isBoolean(0)) || "getActive".equals(method))
+    //    {
+    //        return call(method, arguments.checkBoolean(0));
+    //    }
+    //    throw new NoSuchMethodException("Wrong argument");
+    //}
 
     //NBT
     @Override

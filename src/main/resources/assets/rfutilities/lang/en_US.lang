@@ -42,7 +42,6 @@ chat.rfutilities:isSender.name=This Tesseract is a sender.
 chat.rfutilities:hidden_true.name=This Tesseract is now invisible.
 chat.rfutilities:hidden_false.name=This Tesseract is now visible.
 chat.rfutilities:alreadyDialed.name=Those Tesseracts are already dialed!
-chat.rfutilities:otherDim.name=The Tesseracts need to be in the same dimension!
 
 guiDesc.rfutilities:accept.name=Accept
 guiDesc.rfutilities:decline.name=Decline

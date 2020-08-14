@@ -15,12 +15,11 @@
 
 package XFactHD.rfutilities.common.crafting;
 
+import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.RFUContent;
 import XFactHD.rfutilities.common.utils.MetaItemGetter;
-import cofh.api.modhelpers.ThermalExpansionHelper;
-import cofh.thermalfoundation.fluid.TFFluids;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -62,7 +61,7 @@ public class CraftingRecipes
     private static ItemStack netherQuartz      = new ItemStack(Items.quartz, 1);
     private static ItemStack diamond           = new ItemStack(Items.diamond);
 
-
+    //private static FluidStack fluidEnder       = new FluidStack(TFFluids.fluidEnder, 1000);
 
     private static NBTTagCompound compoundCapTEBasic = new NBTTagCompound();
     private static NBTTagCompound compoundCapTEHardened = new NBTTagCompound();
@@ -72,19 +71,15 @@ public class CraftingRecipes
     private static NBTTagCompound compoundCapEIODouble = new NBTTagCompound();
     private static NBTTagCompound compoundCapEIOVibrant = new NBTTagCompound();
 
-    private static NBTTagCompound compoundDialer = new NBTTagCompound();
-
     public static void init()
     {
-        compoundCapTEBasic.setInteger("type", 1);
-        compoundCapTEHardened.setInteger("type", 2);
-        compoundCapTEReinforced.setInteger("type", 3);
-        compoundCapTEResonant.setInteger("type", 4);
-        compoundCapEIOBasic.setInteger("type", 5);
-        compoundCapEIODouble.setInteger("type", 6);
-        compoundCapEIOVibrant.setInteger("type", 7);
-
-        compoundDialer.setBoolean("modeDial", true);
+        compoundCapTEBasic.setInteger("TYPE", 1);
+        compoundCapTEHardened.setInteger("TYPE", 2);
+        compoundCapTEReinforced.setInteger("TYPE", 3);
+        compoundCapTEResonant.setInteger("TYPE", 4);
+        compoundCapEIOBasic.setInteger("TYPE", 5);
+        compoundCapEIODouble.setInteger("TYPE", 6);
+        compoundCapEIOVibrant.setInteger("TYPE", 7);
 
         capTEBasic.setTagCompound(compoundCapTEBasic);
         capTEHardened.setTagCompound(compoundCapTEHardened);
@@ -94,8 +89,6 @@ public class CraftingRecipes
         capEIODouble.setTagCompound(compoundCapEIODouble);
         capEIOVibrant.setTagCompound(compoundCapEIOVibrant);
 
-        dialer.setTagCompound(compoundDialer);
-
         GameRegistry.addRecipe(new ShapedOreRecipe(rfDiode,           "   ", "EQE", "SSS", 'E', "ingotElectrum", 'Q', netherQuartz, 'S', stoneSlab));
         GameRegistry.addRecipe(new ShapedOreRecipe(rfResistor,        "   ", "ECE", "SSS", 'E', "ingotElectrum", 'C', coal, 'S', stoneSlab));
         GameRegistry.addRecipe(new ShapedOreRecipe(rfSwitch,          "   ", "ELE", "SSS", 'E', "ingotElectrum", 'L', lever, 'S', stoneSlab));
@@ -103,7 +96,7 @@ public class CraftingRecipes
         //GameRegistry.addRecipe(new ShapedOreRecipe(itemDisplay,       "III", "IGI", "EEE", 'I', ingotIron, 'G', glassPane, 'E', "nuggetElectrum"));
         //GameRegistry.addRecipe(new ShapedOreRecipe(rfMeter,           " D ", "ERE", "SSS", 'D', itemDisplay, 'E', "ingotElectrum", 'R', repeater, 'S', stoneSlab));
 
-        if (Loader.isModLoaded("ThermalExpansion"))
+        if (Loader.isModLoaded("ThermalExpansion") || RFUtilities.debugMode)
         {
             GameRegistry.addRecipe(new ShapedOreRecipe(capTEBasic,      " C ", "ELE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEBasic, 'E', "ingotElectrum", 'L', "ingotLead"));
             GameRegistry.addRecipe(new ShapedOreRecipe(capTEHardened,   " C ", "EIE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEHardened, 'E', "ingotElectrum", 'I', "ingotInvar"));
@@ -112,11 +105,11 @@ public class CraftingRecipes
             GameRegistry.addRecipe(new ShapedOreRecipe(hardenedGlassPane, "GGG", "GGG", "   ", 'G', "blockGlassHardened"));
             GameRegistry.addRecipe(new ShapedOreRecipe(itemTessEmpty,     "EGE", "GDG", "EGE", 'E', "nuggetEnderium", 'G', hardenedGlassPane, 'D', diamond));
             GameRegistry.addRecipe(new ShapedOreRecipe(invisTess,         "BSB", "STS", "BSB", 'B', "ingotBronze", 'S', "ingotSilver", 'T', itemTessFull));
-            GameRegistry.addRecipe(new ShapedOreRecipe(dialer,            " C ", "RBR", "III", 'C', MetaItemGetter.coil, 'R', redstone, 'B', Blocks.stone_button, 'I', ingotIron));
-            ThermalExpansionHelper.addTransposerFill(16000, itemTessEmpty, itemTessFull, MetaItemGetter.fluidEnder, false);
+            //GameRegistry.addRecipe(new ShapedOreRecipe(dialer,            " C ", "RBR", "III", 'C', MetaItemGetter.coil, 'R', redstone, 'B', Blocks.stone_button, 'I', ingotIron));
+            //ThermalExpansionHelper.addTransposerFill(16000, itemTessEmpty, itemTessFull, fluidEnder, false);
         }
 
-        if (Loader.isModLoaded("EnderIO"))
+        if (Loader.isModLoaded("EnderIO") || RFUtilities.debugMode)
         {
             GameRegistry.addShapedRecipe(capEIOBasic,   " C ", "EIE", "SSS", 'C', MetaItemGetter.capEIOBasic, 'E',   MetaItemGetter.ingotElectricalSteel, 'S', stoneSlab, 'I', MetaItemGetter.ingotConductiveIron);
             GameRegistry.addShapedRecipe(capEIODouble,  " C ", "EAE", "SSS", 'C', MetaItemGetter.capEIODouble, 'E',  MetaItemGetter.ingotElectricalSteel, 'S', stoneSlab, 'A', MetaItemGetter.ingotEnergeticAlloy);
