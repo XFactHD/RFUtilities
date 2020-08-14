@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD>
+/*  Copyright (C) <2016>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,108 +15,131 @@
 
 package XFactHD.rfutilities.common.blocks.block;
 
-import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.blocks.itemBlock.ItemBlockRFCapacitor;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityCapacitor;
-import XFactHD.rfutilities.common.utils.LogHelper;
-import cofh.thermalexpansion.item.tool.ItemMultimeter;
+import XFactHD.rfutilities.common.items.ItemMultimeter;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 
+import javax.annotation.Nullable;
+import java.util.Arrays;
+
+@SuppressWarnings("deprecation")
 public class BlockCapacitor extends BlockBaseRFU
 {
+    public static PropertyDirection ORIENTATION = PropertyDirection.create("facing", Arrays.asList(EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH, EnumFacing.WEST));
+    public static PropertyInteger TYPE = PropertyInteger.create("type", 1, 7);
+
     public BlockCapacitor()
     {
-        super("blockCapacitor", Material.iron, 1, ItemBlockRFCapacitor.class, "");
+        super("blockCapacitor", Material.IRON, "");
+        this.addItemBlock(new ItemBlockRFCapacitor(this));
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack stack)
+    public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        int l = MathHelper.floor_double((double) (entity.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+        return getDefaultState().withProperty(ORIENTATION, placer.getHorizontalFacing().getOpposite());
+    }
 
-        if (l == 0)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 5, 2);
-        }
-
-        if (l == 1)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 2, 2);
-        }
-
-        if (l == 2)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 3, 2);
-        }
-
-        if (l == 3)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 4, 2);
-        }
-
-        TileEntity te = world.getTileEntity(x, y, z);
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack stack)
+    {
+        TileEntity te = world.getTileEntity(pos);
         if (entity instanceof EntityPlayer && te instanceof TileEntityCapacitor)
         {
-            if ((stack.stackTagCompound) != null)
-            {
-                int type = stack.stackTagCompound.getInteger("type");
-                ((TileEntityCapacitor)te).type = type;
-                world.markBlockForUpdate(x, y, z);
-                //LogHelper.info("Type on stack: " + type + "; Type on tile: " + ((TileEntityCapacitor)world.getTileEntity(x, y, z)).type);
-                te.markDirty();
-            }
+            ((TileEntityCapacitor) te).type = stack.getMetadata()+1;
+            world.scheduleUpdate(pos, world.getBlockState(pos).getBlock(), 0);
+            te.markDirty();
+
         }
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityCapacitor && RFUtilities.TE_LOADED && player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemMultimeter && !world.isRemote)
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof TileEntityCapacitor && hand == EnumHand.MAIN_HAND && heldItem != null && heldItem.getItem() instanceof ItemMultimeter && !world.isRemote)
         {
-            player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("desc.rfutilities:stored.name") + " " + ((TileEntityCapacitor)te).getEnergyStored(ForgeDirection.UNKNOWN) + " " + StatCollector.translateToLocal("desc.rfutilities:rf.name") + " / " + ((TileEntityCapacitor)te).getMaxEnergyStored(ForgeDirection.UNKNOWN) + " " + StatCollector.translateToLocal("desc.rfutilities:rf.name")));
+            player.addChatComponentMessage(new TextComponentString(I18n.format("desc.rfutilities:stored.name") + " " + ((TileEntityCapacitor)te).getEnergyStored(EnumFacing.DOWN) + " " + I18n.format("desc.rfutilities:rf.name") + " / " + ((TileEntityCapacitor)te).getMaxEnergyStored(EnumFacing.DOWN) + " " + I18n.format("desc.rfutilities:rf.name")));
             return true;
         }
         return false;
     }
 
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player)
+    protected BlockStateContainer createBlockState()
     {
-        ItemStack stack = new ItemStack(this, 1);
-        NBTTagCompound compound = new NBTTagCompound();
-        compound.setInteger("type", ((TileEntityCapacitor)world.getTileEntity(x, y, z)).type);
-        stack.setTagCompound(compound);
-        return stack;
+        return new BlockStateContainer(this, ORIENTATION, TYPE);
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world, int meta)
+    public IBlockState getStateFromMeta(int meta)
+    {
+        if (EnumFacing.getFront(meta) == EnumFacing.UP || EnumFacing.getFront(meta) == EnumFacing.DOWN)
+        {
+            return getDefaultState().withProperty(ORIENTATION, EnumFacing.NORTH);
+        }
+        return getDefaultState().withProperty(ORIENTATION, EnumFacing.getFront(meta));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state)
+    {
+        return state.getValue(ORIENTATION).getIndex();
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos)
+    {
+        EnumFacing dir = state.getValue(ORIENTATION);
+        TileEntity te = world.getTileEntity(pos);
+        int cap = 0;
+        if (te instanceof TileEntityCapacitor)
+        {
+            cap = ((TileEntityCapacitor)te).type;
+        }
+        if (cap == 0)
+        {
+            return state.withProperty(ORIENTATION, dir).withProperty(TYPE, 1);
+        }
+        return state.withProperty(ORIENTATION, dir).withProperty(TYPE, cap);
+    }
+
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
+    {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof TileEntityCapacitor)
+        {
+            return new ItemStack(this, 1, ((TileEntityCapacitor)te).type-1);
+        }
+        return null;
+    }
+
+    @Override
+    public TileEntity createTileEntity(World world, IBlockState state)
     {
         return new TileEntityCapacitor();
     }
 
     @Override
-    public int getRenderType()
-    {
-        return -1;
-    }
-
-    @Override
-    public boolean isOpaqueCube()
-    {
-        return false;
-    }
-
-    public boolean renderAsNormalBlock()
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }

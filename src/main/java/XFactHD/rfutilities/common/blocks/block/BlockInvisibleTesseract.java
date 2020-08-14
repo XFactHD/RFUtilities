@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD>
+/*  Copyright (C) <2016>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,290 +15,280 @@
 
 package XFactHD.rfutilities.common.blocks.block;
 
-import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityInvisibleTesseract;
 import XFactHD.rfutilities.common.items.ItemDialer;
+import XFactHD.rfutilities.common.items.ItemMultimeter;
 import XFactHD.rfutilities.common.utils.EventHandler;
-import cofh.thermalexpansion.item.tool.ItemMultimeter;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
+import net.minecraft.util.math.*;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 
+@SuppressWarnings("deprecation")
 public class BlockInvisibleTesseract extends BlockBaseRFU
 {
+    public static PropertyDirection ORIENTATION = PropertyDirection.create("facing");
+
     public BlockInvisibleTesseract()
     {
-        super("blockInvisibleTesseract", Material.iron, 1, ItemBlock.class, "");
+        super("blockInvisibleTesseract", Material.IRON, "");
+        this.addItemBlock(new ItemBlock(this));
     }
 
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack stack)
+    @Override
+    public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        int l = MathHelper.floor_double((double) (entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-        int m = MathHelper.floor_double((double) (entityLivingBase.rotationPitch * 4.0F / 360.0F) + 0.5D) & 3;
-        //LogHelper.info(m);
+        EnumFacing o = EnumFacing.NORTH;
+
+        int l = MathHelper.floor_double((double) (placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+        int m = MathHelper.floor_double((double) (placer.rotationPitch * 4.0F / 360.0F) + 0.5D) & 3;
 
         if (m == 1)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+            o = EnumFacing.DOWN;
         }
         else if (m == 3)
         {
-            world.setBlockMetadataWithNotify(x, y, z, 1, 2);
+            o = EnumFacing.UP;
         }
         else if (m == 0)
         {
             if (l == 0)
             {
-                world.setBlockMetadataWithNotify(x, y, z, 5, 2);
+                o = EnumFacing.SOUTH;
             }
 
             if (l == 1)
             {
-                world.setBlockMetadataWithNotify(x, y, z, 2, 2);
+                o = EnumFacing.WEST;
             }
 
             if (l == 2)
             {
-                world.setBlockMetadataWithNotify(x, y, z, 3, 2);
+                o = EnumFacing.NORTH;
             }
 
             if (l == 3)
             {
-                world.setBlockMetadataWithNotify(x, y, z, 4, 2);
+                o = EnumFacing.EAST;
             }
         }
-        //LogHelper.info("Meta: " + world.getBlockMetadata(x, y, z) + ", l: " + l + ", m: " + m);
+
+        return getDefaultState().withProperty(ORIENTATION, o);
     }
 
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player)
+    protected BlockStateContainer createBlockState()
+    {
+        return new BlockStateContainer(this, ORIENTATION);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta)
+    {
+        return getDefaultState().withProperty(ORIENTATION, EnumFacing.getFront(meta));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state)
+    {
+        return state.getValue(ORIENTATION).getIndex();
+    }
+
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
     {
         return new ItemStack(this, 1, 0);
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float hitX, float hitY, float hitZ)
+    @SuppressWarnings("ConstantConditions")
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         if (!world.isRemote)
         {
-            TileEntityInvisibleTesseract tesseract = ((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z));
-            ItemStack equipped = player.getCurrentEquippedItem();
+            TileEntityInvisibleTesseract tesseract = ((TileEntityInvisibleTesseract)world.getTileEntity(pos));
+            if (tesseract == null) { return false; }
 
-            if(equipped != null && equipped.getItem() instanceof ItemDialer)
+            if(heldItem != null && heldItem.getItem() instanceof ItemDialer)
             {
-                if (equipped.hasTagCompound() && equipped.getTagCompound().hasKey("senderX"))
-                {
-                    int dim = equipped.stackTagCompound.getInteger("dimension");
-                    int senderX = equipped.stackTagCompound.getInteger("senderX");
-                    int senderY = equipped.stackTagCompound.getInteger("senderY");
-                    int senderZ = equipped.stackTagCompound.getInteger("senderZ");
-
-                    if (!equipped.stackTagCompound.getBoolean("modeDial"))
-                    {
-                        tesseract.clearFrequency();
-                        player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:clearedTess.name")));
-                    }
-                    else if (world.provider.dimensionId == dim)
-                    {
-                        TileEntity teTess = world.getTileEntity(senderX, senderY, senderZ);
-                        if (teTess instanceof TileEntityInvisibleTesseract)
-                        {
-                            TileEntityInvisibleTesseract sender = ((TileEntityInvisibleTesseract)teTess);
-                            if (!(sender == tesseract))
-                            {
-                                if (tesseract.dialedSender != null && tesseract.dialedSender == sender)
-                                {
-                                    player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:alreadyDialed.name")));
-                                }
-                                else
-                                {
-                                    tesseract.setActive(true);
-                                    tesseract.setSender(false);
-                                    tesseract.setDialedSender(sender);
-                                    sender.addReceiver(tesseract);
-                                    player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:dialedToSender.name")));
-                                }
-                            }
-                            else
-                            {
-                                player.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.RED + StatCollector.translateToLocal("chat.rfutilities:cantDialSame.name")));
-                            }
-                        }
-                        else
-                        {
-                            player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:missingSender.name")));
-                            NBTTagCompound compound = new NBTTagCompound();
-                            compound.setBoolean("modeDial", true);
-                            equipped.setTagCompound(compound);
-                        }
-                    }
-                    else
-                    {
-                        player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:otherDim.name")));
-                    }
-                }
-                else
-                {
-                    int teDim = tesseract.getWorldObj().provider.dimensionId;
-                    int teX = tesseract.xCoord;
-                    int teY = tesseract.yCoord;
-                    int teZ = tesseract.zCoord;
-                    equipped.getTagCompound().setInteger("dimension", teDim);
-                    equipped.getTagCompound().setInteger("senderX", teX);
-                    equipped.getTagCompound().setInteger("senderY", teY);
-                    equipped.getTagCompound().setInteger("senderZ", teZ);
-                    if (!tesseract.isActive)
-                    {
-                        tesseract.setActive(true);
-                    }
-                    if (!tesseract.isSender)
-                    {
-                        tesseract.setSender(true);
-                    }
-                    player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:dialedToDialer.name")));
-                }
+                handleDialerInteraction(world, player, heldItem, tesseract);
             }
-            else if (equipped != null && (RFUtilities.TE_LOADED && equipped.getItem() instanceof ItemMultimeter))
+            else if (heldItem != null && heldItem.getItem() instanceof ItemMultimeter)
             {
-                if (!player.isSneaking())
-                {
-                    if (tesseract.isActive && tesseract.isSender)
-                    {
-                        player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:isSender.name")));
-                    }
-                    else if (tesseract.isActive)
-                    {
-                        int dialedX = tesseract.dialedSender.xCoord;
-                        int dialedY = tesseract.dialedSender.yCoord;
-                        int dialedZ = tesseract.dialedSender.zCoord;
-                        player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("desc.rfutilities:dialedTo.name") + " " + StatCollector.translateToLocal("desc.rfutilities:tessAt.name") + " X=" + dialedX + ", Y=" + dialedY + ", Z=" + dialedZ + "."));
-                    }
-                    else
-                    {
-                        player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:undialed.name")));
-                    }
-                }
-                else
-                {
-                    tesseract.hidden = !tesseract.hidden;
-                    player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:hidden_" + Boolean.toString(tesseract.hidden) + ".name")));
-                }
+                handleMultiMeterInteraction(player, tesseract);
             }
         }
         return true;
     }
 
+    @Nullable
     @Override
-    public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z)
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, World world, BlockPos pos)
     {
-        if (EventHandler.canItemShowTess || (world.getTileEntity(x, y, z) instanceof TileEntityInvisibleTesseract  && !((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z)).hidden))
+        TileEntity te = world.getTileEntity(pos);
+        if (EventHandler.canItemShowTess || (te instanceof TileEntityInvisibleTesseract  && !((TileEntityInvisibleTesseract)te).hidden))
         {
-            switch (world.getBlockMetadata(x, y, z))
+            switch (world.getBlockState(pos).getValue(ORIENTATION))
             {
-                case 0: setBlockBounds(0F, .14F, .14F, .19F, .86F, .86F);
-                case 1: setBlockBounds(0F, .14F, .14F, .19F, .86F, .86F);
-                case 2: setBlockBounds(0F, .14F, .14F, .19F, .86F, .86F);
-                case 3: setBlockBounds(.14F, .14F, 0F, .86F, .86F, .19F);
-                case 4: setBlockBounds(1F, .14F, .86F, .81F, .86F, .14F);
-                case 5: setBlockBounds(.14F, .14F, .81F, .86F, .86F, 1F);
-                default: setBlockBounds(0F, 0F, 0F, 1F, 1F, 1F);
+                case DOWN:  return new AxisAlignedBB(.13F,   0F, .13F, .87F, .19F, .87F);
+                case UP:    return new AxisAlignedBB(.13F, .81F, .13F, .87F,   1F, .87F);
+                case NORTH: return new AxisAlignedBB(.14F, .14F,   0F, .86F, .86F, .19F);
+                case SOUTH: return new AxisAlignedBB(.14F, .14F, .81F, .86F, .86F,   1F);
+                case WEST:  return new AxisAlignedBB(  0F, .14F, .14F, .19F, .86F, .86F);
+                case EAST:  return new AxisAlignedBB(  1F, .14F, .86F, .81F, .86F, .14F);
+                default:    return new AxisAlignedBB(  0F,   0F,   0F,   1F,   1F,   1F);
             }
         }
         else
         {
-            setBlockBounds(0F, 0F, 0F, 0F, 0F, 0F);
+            return new AxisAlignedBB(0F, 0F, 0F, 0F, 0F, 0F);
         }
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z)
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World world, BlockPos pos)
     {
-        if (EventHandler.canItemShowTess || (world.getTileEntity(x, y, z) instanceof TileEntityInvisibleTesseract  && !((TileEntityInvisibleTesseract)world.getTileEntity(x, y, z)).hidden))
-        {
-            switch (world.getBlockMetadata(x, y, z))
-            {
-                case 0: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y, (double)z+.13D, (double)x+.87D, (double)y+.19D, (double)z+.87D);
-                case 1: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y+.81D, (double)z+.13D, (double)x+.87D, (double)y+1D, (double)z+.87D);
-                case 2: return AxisAlignedBB.getBoundingBox((double)x, (double)y+.14D, (double)z+.14D, (double)x+.19D, (double)y+.86D, (double)z+.86D);
-                case 3: return AxisAlignedBB.getBoundingBox((double)x+.14D, (double)y+.14D, (double)z, (double)x+.86D, (double)y+.86D, (double)z+.19D);
-                case 4: return AxisAlignedBB.getBoundingBox((double)x+1, (double)y+.14D, (double)z+.86D, (double)x+.81D, (double)y+.86D, (double)z+.14D);
-                case 5: return AxisAlignedBB.getBoundingBox((double)x+.14D, (double)y+.14D, (double)z+.81D, (double)x+.86D, (double)y+.86D, (double)z+1);
-                default: return AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)x+1, (double)y+1, (double)z+1);
-            }
-        }
-        else
-        {
-            return null;
-        }
+        //noinspection ConstantConditions
+        return getCollisionBoundingBox(state, world, pos).offset(pos);
     }
 
     @Override
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z)
-    {
-        switch (world.getBlockMetadata(x, y, z))
-        {
-            case 0: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y,      (double)z+.13D, (double)x+.87D, (double)y+.19D, (double)z+.87D);
-            case 1: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y+.81D, (double)z+.13D, (double)x+.87D, (double)y  +1D, (double)z+.87D);
-            case 2: return AxisAlignedBB.getBoundingBox((double)x, (double)y+.13D, (double)z+.13D, (double)x+.2D, (double)y+.87D, (double)z+.87D);
-            case 3: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y+.13D, (double)z, (double)x+.87D, (double)y+.87D, (double)z+.2D);
-            case 4: return AxisAlignedBB.getBoundingBox((double)x+1, (double)y+.13D, (double)z+.87D, (double)x+.8D, (double)y+.87D, (double)z+.13D);
-            case 5: return AxisAlignedBB.getBoundingBox((double)x+.13D, (double)y+.13D, (double)z+.8D, (double)x+.87D, (double)y+.87D, (double)z+1);
-            default: return AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)x+1, (double)y+1, (double)z+1);
-        }
-    }
-
-    @Override
-    public MovingObjectPosition collisionRayTrace(World world, int x, int y, int z, Vec3 startVec, Vec3 endVec)
-    {
-        return super.collisionRayTrace(world, x, y, z, startVec, endVec);
-    }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
+    public TileEntity createTileEntity(World world, IBlockState state)
     {
         return new TileEntityInvisibleTesseract();
     }
 
     @Override
-    public boolean canDismantle(EntityPlayer entityPlayer, World world, int x, int y, int z)
-    {
-        return true;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public ArrayList<ItemStack> dismantleBlock(EntityPlayer entityPlayer, World world, int x, int y, int z, boolean b)
-    {
-        ItemStack stack = new ItemStack(Item.getItemFromBlock(new BlockInvisibleTesseract()));
-        ArrayList list = new ArrayList<ItemStack>();
-        list.add(stack);
-        return list;
-    }
-
-    @Override
-    public int getRenderType()
-{
-    return -1;
-}
-
-    @Override
-    public boolean isOpaqueCube()
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
 
-    public boolean renderAsNormalBlock()
+    @Override
+    public boolean isFullCube(IBlockState state)
     {
         return false;
+    }
+
+    @Override
+    public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
+    {
+        return side == world.getBlockState(pos).getValue(ORIENTATION);
+    }
+
+    private void handleDialerInteraction(World world, EntityPlayer player, ItemStack stack, TileEntityInvisibleTesseract tesseract)
+    {
+        if (stack.hasTagCompound())
+        {
+            //noinspection ConstantConditions
+            BlockPos tePos = BlockPos.fromLong(stack.getTagCompound().getLong("senderPos"));
+
+            if (!stack.getTagCompound().getBoolean("modeDial"))
+            {
+                tesseract.clearFrequency();
+                player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:clearedTess.name"));
+            }
+            else
+            {
+                TileEntity teTess = world.getTileEntity(tePos);
+                if (teTess instanceof TileEntityInvisibleTesseract)
+                {
+                    TileEntityInvisibleTesseract sender = ((TileEntityInvisibleTesseract)teTess);
+                    if (sender != tesseract)
+                    {
+                        if (tesseract.dialedSender != null && tesseract.dialedSender == sender)
+                        {
+                            player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:alreadyDialed.name"));
+                        }
+                        else
+                        {
+                            tesseract.setActive(true);
+                            tesseract.setSender(false);
+                            tesseract.setDialedSender(sender);
+                            sender.addReceiver(tesseract);
+                            player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:dialedToSender.name"));
+                        }
+                    }
+                    else
+                    {
+                        player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:cantDialSame.name", TextFormatting.RED));
+                    }
+                }
+                else
+                {
+                    player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:missingSender.name"));
+                    //noinspection ConstantConditions
+                    stack.setTagCompound(null);
+                }
+            }
+
+        }
+        else
+        {
+            NBTTagCompound compound = new NBTTagCompound();
+            long tePos = tesseract.getPos().toLong();
+            compound.setLong("senderPos", tePos);
+            stack.setTagCompound(compound);
+            if (!tesseract.isActive)
+            {
+                tesseract.setActive(true);
+            }
+            tesseract.setSender(true);
+            player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:dialedToDialer.name"));
+        }
+    }
+
+    private void handleMultiMeterInteraction(EntityPlayer player, TileEntityInvisibleTesseract tesseract)
+    {
+        if (!player.isSneaking())
+        {
+            if (tesseract.isActive && tesseract.isSender)
+            {
+                player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:isSender.name"));
+                player.addChatComponentMessage(new TextComponentString(I18n.format("desc.rfutilities:dialedTo.name")));
+                for (BlockPos recPos : tesseract.getDialedReceivers())
+                {
+                    player.addChatComponentMessage(new TextComponentString(I18n.format("desc.rfutilities:tessAt.name") + " " + recPos.toString()));
+                }
+            }
+            else if (tesseract.isActive)
+            {
+                BlockPos tePos = tesseract.dialedSender.getPos();
+                player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:isReceiver.name"));
+                player.addChatComponentMessage(new TextComponentString(I18n.format("desc.rfutilities:dialedTo.name") + " " + I18n.format("desc.rfutilities:tessAt.name") + " " + tePos.toString() + "."));
+            }
+            else
+            {
+                player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:undialed.name"));
+            }
+        }
+        else
+        {
+            tesseract.hidden = !tesseract.hidden;
+            player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:hidden_" + Boolean.toString(tesseract.hidden) + ".name"));
+        }
     }
 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD>
+/*  Copyright (C) <2016>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,16 +15,17 @@
 
 package XFactHD.rfutilities.common.items;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -33,77 +34,58 @@ public class ItemDialer extends ItemBaseRFU
 {
     public ItemDialer()
     {
-        super("itemDialer", 1, 2, "Dialer");
+        super("itemDialer", 1, "Dialer");
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean b)
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean b)
     {
         if (stack.hasTagCompound())
         {
-            String mode = stack.stackTagCompound.getBoolean("modeDial") ? StatCollector.translateToLocal("desc.rfutilities:modeDial.name") : StatCollector.translateToLocal("desc.rfutilities:modeClear.name");
+            //noinspection ConstantConditions
+            String mode = stack.getTagCompound().getBoolean("modeDial") ? I18n.format("desc.rfutilities:modeDial.name") : I18n.format("desc.rfutilities:modeClear.name");
             list.add(mode);
 
-            if (stack.stackTagCompound.hasKey("senderX"))
+            if (stack.getTagCompound().hasKey("senderX"))
             {
                 int x = stack.getTagCompound().getInteger("senderX");
                 int y = stack.getTagCompound().getInteger("senderY");
                 int z = stack.getTagCompound().getInteger("senderZ");
-                String dialed = StatCollector.translateToLocal("desc.rfutilities:dialedTo.name") + " " + StatCollector.translateToLocal("desc.rfutilities:tessAt.name") + " X=" + x + ", Y=" + y + ", Z=" + z + ".";
-                list.add(EnumChatFormatting.GREEN + dialed);
+                String dialed = I18n.format("desc.rfutilities:dialedTo.name") + " " + I18n.format("desc.rfutilities:tessAt.name") + " X=" + x + ", Y=" + y + ", Z=" + z + ".";
+                list.add(TextFormatting.GREEN + dialed);
             }
             else
             {
-                String notDialed = EnumChatFormatting.RED + StatCollector.translateToLocal("desc.rfutilities:dialedTo.name") + " " + StatCollector.translateToLocal("desc.rfutilities:nothing.name");
-                list.add(EnumChatFormatting.RED + notDialed);
+                String notDialed = TextFormatting.RED + I18n.format("desc.rfutilities:dialedTo.name") + " " + I18n.format("desc.rfutilities:nothing.name");
+                list.add(TextFormatting.RED + notDialed);
             }
         }
         super.addInformation(stack, player, list, b);
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player)
+    public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand)
     {
-        if (!world.isRemote && player.isSneaking() && stack.stackTagCompound.getBoolean("modeDial"))
+        //noinspection ConstantConditions
+        if (!world.isRemote && player.isSneaking() && stack.getTagCompound().getBoolean("modeDial"))
         {
+            //noinspection ConstantConditions
             stack.setTagCompound(null);
             NBTTagCompound compound = new NBTTagCompound();
             compound.setBoolean("modeDial", true);
             stack.setTagCompound(compound);
-            player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat.rfutilities:clearedDialer.name")));
+            player.addChatComponentMessage(new TextComponentTranslation("chat.rfutilities:clearedDialer.name"));
         }
-        return stack;
+        return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void getSubItems(Item item, CreativeTabs tab, List list)
+    public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> list)
     {
         ItemStack stack = new ItemStack(item, 1, 0);
         NBTTagCompound compound = new NBTTagCompound();
         compound.setBoolean("modeDial", true);
         stack.setTagCompound(compound);
         list.add(stack);
-    }
-
-    @Override
-    public void registerIcons(IIconRegister iconRegister)
-    {
-        icons[0][0] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Dial
-        icons[0][1] = iconRegister.registerIcon("ThermalExpansion:tool/Multimeter"); //Mode Clear
-    }
-
-    @Override
-    public IIcon getIcon(ItemStack stack, int pass)
-    {
-        if (stack.hasTagCompound())
-        {
-            return stack.stackTagCompound.getBoolean("modeDial") ? icons[0][0] : icons[0][1];
-        }
-        else
-        {
-            return icons[0][0];
-        }
     }
 }

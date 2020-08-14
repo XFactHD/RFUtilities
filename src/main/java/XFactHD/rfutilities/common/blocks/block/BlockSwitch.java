@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD>
+/*  Copyright (C) <2016>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,90 +15,104 @@
 
 package XFactHD.rfutilities.common.blocks.block;
 
-import XFactHD.rfutilities.RFUtilities;
-import XFactHD.rfutilities.client.models.ModelSwitch;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntitySwitch;
-import XFactHD.rfutilities.common.utils.LogHelper;
-import XFactHD.rfutilities.common.utils.Reference;
-import cofh.thermalexpansion.item.tool.ItemWrench;
+//import cofh.thermalexpansion.item.tool.ItemWrench;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
+import java.util.Arrays;
+
+@SuppressWarnings("deprecation")
 public class BlockSwitch extends BlockBaseRFU
 {
+    public static PropertyDirection ORIENTATION = PropertyDirection.create("facing", Arrays.asList(EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH, EnumFacing.WEST));
+    private static PropertyBool status = PropertyBool.create("status");
+
     public BlockSwitch()
     {
-        super("blockSwitch", Material.iron, 1, ItemBlock.class, "");
-    }
-
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack stack)
-    {
-        int l = MathHelper.floor_double((double) (entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-
-        if (l == 0)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 5, 2);
-        }
-
-        if (l == 1)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 2, 2);
-        }
-
-        if (l == 2)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 3, 2);
-        }
-
-        if (l == 3)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 4, 2);
-        }
+        super("blockSwitch", Material.IRON, "");
+        this.addItemBlock(new ItemBlock(this));
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float hitX, float hitY, float hitZ)
+    protected BlockStateContainer createBlockState()
     {
-        if (player.getCurrentEquippedItem() == null || (RFUtilities.TE_LOADED && !(player.getCurrentEquippedItem().getItem() instanceof ItemWrench)))
+        return new BlockStateContainer(this, ORIENTATION, status);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta)
+    {
+        if (meta == 0 || meta == 1)
         {
-            TileEntity te = world.getTileEntity(x, y, z);
+            meta = EnumFacing.NORTH.getIndex();
+        }
+        return getDefaultState().withProperty(ORIENTATION, EnumFacing.getFront(meta));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state)
+    {
+        return state.getValue(ORIENTATION).getIndex();
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos)
+    {
+        TileEntity te = world.getTileEntity(pos);
+        boolean on = false;
+        if (te instanceof TileEntitySwitch)
+        {
+            on = ((TileEntitySwitch)te).getIsOn();
+        }
+        return state.withProperty(status, on);
+    }
+
+    @Override
+    public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+    {
+        return getDefaultState().withProperty(ORIENTATION, placer.getHorizontalFacing().getOpposite());
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+    {
+        //if (heldItem == null || !(heldItem.getItem() instanceof ItemWrench))
+        //{
+            TileEntity te = world.getTileEntity(pos);
             if (te instanceof TileEntitySwitch)
             {
-                ((TileEntitySwitch)te).isOn = !((TileEntitySwitch)te).isOn;
-                world.markBlockForUpdate(x, y, z);
+                ((TileEntitySwitch)te).setIsOn(!((TileEntitySwitch)te).getIsOn());
+                world.scheduleUpdate(pos, world.getBlockState(pos).getBlock(), 1);
+                world.markBlockRangeForRenderUpdate(pos, pos);
+                world.playSound(null, pos, SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3F, ((TileEntitySwitch)te).getIsOn() ? 0.6F : 0.5F);
             }
-        }
+        //}
+        //else if (heldItem != null && heldItem.getItem() instanceof ItemWrench)
+        //{
+        //    state.cycleProperty(ORIENTATION);
+        //}
         return true;
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world, int meta)
+    public TileEntity createTileEntity(World world, IBlockState state)
     {
         return new TileEntitySwitch();
-    }
-
-    @Override
-    public int getRenderType()
-    {
-        return -1;
-    }
-
-    @Override
-    public boolean isOpaqueCube()
-    {
-        return false;
-    }
-
-    public boolean renderAsNormalBlock()
-    {
-        return false;
     }
 }

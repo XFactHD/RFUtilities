@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD>
+/*  Copyright (C) <2016>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,28 +15,31 @@
 
 package XFactHD.rfutilities.common.crafting;
 
+import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.RFUContent;
 import XFactHD.rfutilities.common.utils.MetaItemGetter;
-import cofh.api.modhelpers.ThermalExpansionHelper;
-import cofh.thermalfoundation.fluid.TFFluids;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.registry.GameRegistry;
+import exter.substratum.fluid.SubstratumFluids;
+import exter.substratum.item.SubstratumItems;
+import exter.substratum.material.EnumMaterial;
+import exter.substratum.material.EnumMaterialItem;
+import net.minecraftforge.fluids.*;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class CraftingRecipes
 {
-    private static ItemStack capTEBasic        = new ItemStack(RFUContent.blockCapacitor, 1);
-    private static ItemStack capTEHardened     = new ItemStack(RFUContent.blockCapacitor, 1);
-    private static ItemStack capTEReinforced   = new ItemStack(RFUContent.blockCapacitor, 1);
-    private static ItemStack capTEResonant     = new ItemStack(RFUContent.blockCapacitor, 1);
-    private static ItemStack capEIOBasic       = new ItemStack(RFUContent.blockCapacitor, 1);
-    private static ItemStack capEIODouble      = new ItemStack(RFUContent.blockCapacitor, 1);
-    private static ItemStack capEIOVibrant     = new ItemStack(RFUContent.blockCapacitor, 1);
+    private static ItemStack capTEBasic        = new ItemStack(RFUContent.blockCapacitor, 1, 0);
+    private static ItemStack capTEHardened     = new ItemStack(RFUContent.blockCapacitor, 1, 1);
+    private static ItemStack capTEReinforced   = new ItemStack(RFUContent.blockCapacitor, 1, 2);
+    private static ItemStack capTEResonant     = new ItemStack(RFUContent.blockCapacitor, 1, 3);
+    private static ItemStack capEIOBasic       = new ItemStack(RFUContent.blockCapacitor, 1, 4);
+    private static ItemStack capEIODouble      = new ItemStack(RFUContent.blockCapacitor, 1, 5);
+    private static ItemStack capEIOVibrant     = new ItemStack(RFUContent.blockCapacitor, 1, 6);
 
     private static ItemStack dialer            = new ItemStack(RFUContent.itemDialer, 1);
 
@@ -44,83 +47,71 @@ public class CraftingRecipes
     private static ItemStack rfResistor        = new ItemStack(RFUContent.blockResistor);
     private static ItemStack rfDiode           = new ItemStack(RFUContent.blockDiode);
     private static ItemStack invisTess         = new ItemStack(RFUContent.blockInvisTess);
-    //private static ItemStack rfMeter           = new ItemStack(RFUContent.blockRFMeter);
+    private static ItemStack rfMeter           = new ItemStack(RFUContent.blockRFMeter);
     private static ItemStack rfTransistor      = new ItemStack(RFUContent.blockTransistor);
 
-    private static ItemStack itemTessEmpty     = new ItemStack(RFUContent.itemMaterialTess, 1, 0);
-    private static ItemStack itemTessFull      = new ItemStack(RFUContent.itemMaterialTess, 1, 1);
-    //private static ItemStack itemDisplay       = new ItemStack(RFUContent.itemMaterialDisplay, 1, 0);
     private static ItemStack hardenedGlassPane = new ItemStack(RFUContent.itemMaterial, 1, 0);
+    private static ItemStack hardenedGlassPane4= new ItemStack(RFUContent.itemMaterial, 4, 0);
+    private static ItemStack itemTessEmpty     = new ItemStack(RFUContent.itemMaterial, 1, 1);
+    private static ItemStack itemTessFull      = new ItemStack(RFUContent.itemMaterial, 1, 2);
+    private static ItemStack itemDisplay       = new ItemStack(RFUContent.itemMaterial, 1, 3);
+    private static ItemStack redstoneCircuit   = new ItemStack(RFUContent.itemMaterial, 1, 4);
 
-    private static ItemStack stoneSlab         = new ItemStack(Blocks.stone_slab, 1, 0);
-    private static ItemStack coal              = new ItemStack(Items.coal, 1, 0);
-    private static ItemStack lever             = new ItemStack(Blocks.lever, 1);
-    private static ItemStack redstone          = new ItemStack(Items.redstone);
-    private static ItemStack glassPane         = new ItemStack(Blocks.glass_pane, 1);
-    private static ItemStack ingotIron         = new ItemStack(Items.iron_ingot, 1);
-    private static ItemStack repeater          = new ItemStack(Items.repeater, 1);
-    private static ItemStack netherQuartz      = new ItemStack(Items.quartz, 1);
-    private static ItemStack diamond           = new ItemStack(Items.diamond);
+    private static ItemStack stoneSlab         = new ItemStack(Blocks.STONE_SLAB, 1, 0);
 
-
-
-    private static NBTTagCompound compoundCapTEBasic = new NBTTagCompound();
-    private static NBTTagCompound compoundCapTEHardened = new NBTTagCompound();
-    private static NBTTagCompound compoundCapTEReinforced = new NBTTagCompound();
-    private static NBTTagCompound compoundCapTEResonant = new NBTTagCompound();
-    private static NBTTagCompound compoundCapEIOBasic = new NBTTagCompound();
-    private static NBTTagCompound compoundCapEIODouble = new NBTTagCompound();
-    private static NBTTagCompound compoundCapEIOVibrant = new NBTTagCompound();
-
-    private static NBTTagCompound compoundDialer = new NBTTagCompound();
+    private static ItemStack bucketEnder       = SubstratumItems.getStack(EnumMaterialItem.BUCKET_LIQUID, EnumMaterial.ENDERPEARL);
 
     public static void init()
     {
-        compoundCapTEBasic.setInteger("type", 1);
-        compoundCapTEHardened.setInteger("type", 2);
-        compoundCapTEReinforced.setInteger("type", 3);
-        compoundCapTEResonant.setInteger("type", 4);
-        compoundCapEIOBasic.setInteger("type", 5);
-        compoundCapEIODouble.setInteger("type", 6);
-        compoundCapEIOVibrant.setInteger("type", 7);
+        addShapedOreRecipe(rfDiode,         "   ", "EQE", "SSS", 'E', "ingotElectrum", 'Q', "gemQuartz", 'S', stoneSlab);
+        addShapedOreRecipe(rfResistor,      "   ", "ECE", "SSS", 'E', "ingotElectrum", 'C', "coal", 'S', stoneSlab);
+        addShapedOreRecipe(rfSwitch,        "   ", "ELE", "SSS", 'E', "ingotElectrum", 'L', Blocks.LEVER, 'S', stoneSlab);
+        addShapedOreRecipe(rfTransistor,    " R ", "ELE", "SSS", 'E', "ingotElectrum", 'L', Blocks.LEVER, 'R', "dustRedstone", 'S', stoneSlab);
+        addShapedOreRecipe(itemDisplay,     "III", "IGI", "EEE", 'I', "ingotIron", 'G', "paneGlass", 'E', "nuggetElectrum");
+        addShapedOreRecipe(redstoneCircuit, "ETE", "ERE", "ETE", 'E', "nuggetElectrum", 'R', "dustRedstone", 'T', Blocks.REDSTONE_TORCH);
+        addShapedOreRecipe(rfMeter,         " D ", "ERE", "SSS", 'D', itemDisplay, 'E', "ingotElectrum", 'R', redstoneCircuit, 'S', stoneSlab);
+        addShapedOreRecipe(itemTessEmpty,   "EGE", "GDG", "EGE", 'E', "nuggetEnderium", 'G', hardenedGlassPane, 'D', Items.DIAMOND);
+        addShapedOreRecipe(itemTessFull,    " E ", " T ", "   ", 'T', itemTessEmpty, 'E', bucketEnder);
+        addShapedOreRecipe(invisTess,       "BSB", "STS", "BSB", 'B', "ingotBronze", 'S', "ingotSilver", 'T', itemTessFull);
+        addShapedOreRecipe(dialer,          " C ", "RBR", "III", 'C', "gearElectrum", 'R', "dustRedstone", 'B', Blocks.STONE_BUTTON, 'I', "ingotIron");
 
-        compoundDialer.setBoolean("modeDial", true);
-
-        capTEBasic.setTagCompound(compoundCapTEBasic);
-        capTEHardened.setTagCompound(compoundCapTEHardened);
-        capTEReinforced.setTagCompound(compoundCapTEReinforced);
-        capTEResonant.setTagCompound(compoundCapTEResonant);
-        capEIOBasic.setTagCompound(compoundCapEIOBasic);
-        capEIODouble.setTagCompound(compoundCapEIODouble);
-        capEIOVibrant.setTagCompound(compoundCapEIOVibrant);
-
-        dialer.setTagCompound(compoundDialer);
-
-        GameRegistry.addRecipe(new ShapedOreRecipe(rfDiode,           "   ", "EQE", "SSS", 'E', "ingotElectrum", 'Q', netherQuartz, 'S', stoneSlab));
-        GameRegistry.addRecipe(new ShapedOreRecipe(rfResistor,        "   ", "ECE", "SSS", 'E', "ingotElectrum", 'C', coal, 'S', stoneSlab));
-        GameRegistry.addRecipe(new ShapedOreRecipe(rfSwitch,          "   ", "ELE", "SSS", 'E', "ingotElectrum", 'L', lever, 'S', stoneSlab));
-        GameRegistry.addRecipe(new ShapedOreRecipe(rfTransistor,      " R ", "ELE", "SSS", 'E', "ingotElectrum", 'L', lever, 'R', redstone, 'S', stoneSlab));
-        //GameRegistry.addRecipe(new ShapedOreRecipe(itemDisplay,       "III", "IGI", "EEE", 'I', ingotIron, 'G', glassPane, 'E', "nuggetElectrum"));
-        //GameRegistry.addRecipe(new ShapedOreRecipe(rfMeter,           " D ", "ERE", "SSS", 'D', itemDisplay, 'E', "ingotElectrum", 'R', repeater, 'S', stoneSlab));
-
-        if (Loader.isModLoaded("ThermalExpansion"))
+        if (OreDictionary.doesOreNameExist("ingotElectricalSteel"))
         {
-            GameRegistry.addRecipe(new ShapedOreRecipe(capTEBasic,      " C ", "ELE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEBasic, 'E', "ingotElectrum", 'L', "ingotLead"));
-            GameRegistry.addRecipe(new ShapedOreRecipe(capTEHardened,   " C ", "EIE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEHardened, 'E', "ingotElectrum", 'I', "ingotInvar"));
-            GameRegistry.addRecipe(new ShapedOreRecipe(capTEReinforced, " C ", "EEE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEReinforced, 'E', "ingotElectrum"));
-            GameRegistry.addRecipe(new ShapedOreRecipe(capTEResonant,   " C ", "ERE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEResonant, 'E', "ingotElectrum", 'R', "ingotEnderium"));
-            GameRegistry.addRecipe(new ShapedOreRecipe(hardenedGlassPane, "GGG", "GGG", "   ", 'G', "blockGlassHardened"));
-            GameRegistry.addRecipe(new ShapedOreRecipe(itemTessEmpty,     "EGE", "GDG", "EGE", 'E', "nuggetEnderium", 'G', hardenedGlassPane, 'D', diamond));
-            GameRegistry.addRecipe(new ShapedOreRecipe(invisTess,         "BSB", "STS", "BSB", 'B', "ingotBronze", 'S', "ingotSilver", 'T', itemTessFull));
-            GameRegistry.addRecipe(new ShapedOreRecipe(dialer,            " C ", "RBR", "III", 'C', MetaItemGetter.coil, 'R', redstone, 'B', Blocks.stone_button, 'I', ingotIron));
-            ThermalExpansionHelper.addTransposerFill(16000, itemTessEmpty, itemTessFull, MetaItemGetter.fluidEnder, false);
+            addShapedOreRecipe(rfDiode,      "   ", "EQE", "SSS", 'E', "ingotElectricalSteel", 'Q', "gemQuartz", 'S', stoneSlab);
+            addShapedOreRecipe(rfResistor,   "   ", "ECE", "SSS", 'E', "ingotElectricalSteel", 'C', "coal", 'S', stoneSlab);
+            addShapedOreRecipe(rfSwitch,     "   ", "ELE", "SSS", 'E', "ingotElectricalSteel", 'L', Blocks.LEVER, 'S', stoneSlab);
+            addShapedOreRecipe(rfTransistor, " R ", "ELE", "SSS", 'E', "ingotElectricalSteel", 'L', Blocks.LEVER, 'R', "dustRedstone", 'S', stoneSlab);
+            addShapedOreRecipe(itemDisplay,  "III", "IGI", "EEE", 'I', "ingotIron", 'G', "paneGlass", 'E', "nuggetElectricalSteel");
+            addShapedOreRecipe(rfMeter,      " D ", "ERE", "SSS", 'D', itemDisplay, 'E', "ingotElectricalSteel", 'R', redstoneCircuit, 'S', stoneSlab);
         }
 
-        if (Loader.isModLoaded("EnderIO"))
+        if (OreDictionary.doesOreNameExist("blockGlassHardened"))
         {
-            GameRegistry.addShapedRecipe(capEIOBasic,   " C ", "EIE", "SSS", 'C', MetaItemGetter.capEIOBasic, 'E',   MetaItemGetter.ingotElectricalSteel, 'S', stoneSlab, 'I', MetaItemGetter.ingotConductiveIron);
-            GameRegistry.addShapedRecipe(capEIODouble,  " C ", "EAE", "SSS", 'C', MetaItemGetter.capEIODouble, 'E',  MetaItemGetter.ingotElectricalSteel, 'S', stoneSlab, 'A', MetaItemGetter.ingotEnergeticAlloy);
-            GameRegistry.addShapedRecipe(capEIOVibrant, " C ", "EVE", "SSS", 'C', MetaItemGetter.capEIOVibrant, 'E', MetaItemGetter.ingotElectricalSteel, 'S', stoneSlab, 'V', MetaItemGetter.ingotVibrantAlloy);
+            addShapedOreRecipe(hardenedGlassPane, "GGG", "GGG", "   ", 'G', "blockGlassHardened");
         }
+        else
+        {
+            addShapedOreRecipe(hardenedGlassPane4, "LGL", "GOG", "LGL", 'L', "dustLead", 'G', "paneGlass", 'O', "obsidian");
+        }
+
+        if (RFUtilities.TE_LOADED)
+        {
+            addShapedOreRecipe(capTEBasic,      " C ", "ELE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEBasic, 'E', "ingotElectrum", 'L', "ingotLead");
+            addShapedOreRecipe(capTEHardened,   " C ", "EIE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEHardened, 'E', "ingotElectrum", 'I', "ingotInvar");
+            addShapedOreRecipe(capTEReinforced, " C ", "EEE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEReinforced, 'E', "ingotElectrum");
+            addShapedOreRecipe(capTEResonant,   " C ", "ERE", "SSS", 'S', stoneSlab, 'C', MetaItemGetter.capTEResonant, 'E', "ingotElectrum", 'R', "ingotEnderium");
+        }
+
+        if (RFUtilities.EIO_LOADED)
+        {
+            addShapedOreRecipe(capEIOBasic,   " C ", "EIE", "SSS", 'C', MetaItemGetter.capEIOBasic, 'E',   "ingotElectricalSteel", 'S', stoneSlab, 'I', "ingotConductiveIron");
+            addShapedOreRecipe(capEIODouble,  " C ", "EAE", "SSS", 'C', MetaItemGetter.capEIODouble, 'E',  "ingotElectricalSteel", 'S', stoneSlab, 'A', "ingotEnergeticAlloy");
+            addShapedOreRecipe(capEIOVibrant, " C ", "EVE", "SSS", 'C', MetaItemGetter.capEIOVibrant, 'E', "ingotElectricalSteel", 'S', stoneSlab, 'V', "ingotVibrantAlloy");
+        }
+    }
+
+    private static void addShapedOreRecipe(ItemStack output, Object... inputs)
+    {
+        GameRegistry.addRecipe(new ShapedOreRecipe(output, inputs));
     }
 }

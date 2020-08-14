@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD, DrakoAlcarus>
+/*  Copyright (C) <2016>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,13 +15,12 @@
 
 package XFactHD.rfutilities.common.utils;
 
-import cofh.thermalexpansion.item.TEItems;
-import cofh.thermalfoundation.fluid.TFFluids;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.registry.GameRegistry;
+//import cofh.thermalexpansion.item.TEItems;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class MetaItemGetter
@@ -31,7 +30,7 @@ public class MetaItemGetter
     public static ItemStack ingotVibrantAlloy;
     public static ItemStack ingotElectricalSteel;
 
-    public static ItemStack coil;
+    //public static ItemStack coil;
 
     public static ItemStack capTEBasic;
     public static ItemStack capTEHardened;
@@ -40,8 +39,6 @@ public class MetaItemGetter
     public static ItemStack capEIOBasic;
     public static ItemStack capEIODouble;
     public static ItemStack capEIOVibrant;
-
-    public static FluidStack fluidEnder;
 
     public static void init()
     {
@@ -53,19 +50,17 @@ public class MetaItemGetter
             capTEReinforced = new ItemStack(capItemTE, 1, 4);
             capTEResonant = new ItemStack(capItemTE, 1, 5);
 
-            coil = TEItems.powerCoilGold.copy();
-
-            fluidEnder = new FluidStack(TFFluids.fluidEnder, 1000);
+            //coil = TEItems.powerCoilGold.copy();
         }
 
         if (Loader.isModLoaded("EnderIO"))
         {
-            Item capItemEIO = GameRegistry.findItem("EnderIO", "itemBasicCapacitor");
+            Item capItemEIO = Item.REGISTRY.getObject(new ResourceLocation("EnderIO", "itemBasicCapacitor"));
             capEIOBasic = new ItemStack(capItemEIO, 1, 0);
             capEIODouble = new ItemStack(capItemEIO, 1, 1);
             capEIOVibrant = new ItemStack(capItemEIO, 1, 2);
 
-            Item alloyItem = GameRegistry.findItem("EnderIO", "itemAlloy");
+            Item alloyItem = Item.REGISTRY.getObject(new ResourceLocation("EnderIO", "itemAlloy"));
             ingotElectricalSteel = new ItemStack(alloyItem, 1, 0);
             ingotConductiveIron = new ItemStack(alloyItem, 1, 4);
             ingotEnergeticAlloy = new ItemStack(alloyItem, 1, 1);

@@ -1,16 +1,19 @@
 tile.rfutilities:blockSwitch.name=RF Switch
 tile.rfutilities:blockResistor.name=RF Resistor
 tile.rfutilities:blockCapacitor.name=RF Capacitor
-tile.rfutilities:blockInvisibleTesseract.name=Cloakable RF Tesseract
+tile.rfutilities:blockInvisibleTesseract.name=Simple RF Tesseract
 tile.rfutilities:blockDiode.name=RF Diode
 tile.rfutilities:blockRFMeter.name=RF Meter
 tile.rfutilities:blockTransistor.name=RF Transistor
 
-item.rfutilities:itemMaterialTess.TessEmpty.name=Invisible Tesseract Frame (Empty)
-item.rfutilities:itemMaterialTess.TessFull.name=Invisible Tesseract Frame (Full)
 item.rfutilities:itemMaterialDisplay.Display.name=Display
 item.rfutilities:itemMaterial.HardenedGlassPane.name=Hardened Glass Pane
+item.rfutilities:itemMaterial.TessEmpty.name=Simple Tesseract Frame (Empty)
+item.rfutilities:itemMaterial.TessFull.name=Simple Tesseract Frame (Filled)
+item.rfutilities:itemMaterial.Display.name=Display
+item.rfutilities:itemMaterial.RedstoneCircuit.name=Redstone Circuit
 item.rfutilities:itemDialer.Dialer.name=Tesseract Dialer
+item.rfutilities:itemMultimeter.Multimeter.name=Multimeter
 
 desc.rfutilities:through.name=Current throughput:
 desc.rfutilities:stored.name=Currently stored:
@@ -39,10 +42,11 @@ chat.rfutilities:undialed.name=This Tesseract isn't dialed to anything!
 chat.rfutilities:dialedToDialer.name=Successfully saved data to dialer!
 chat.rfutilities:cantDialSame.name=You can't dial a Tesseract to itself!
 chat.rfutilities:isSender.name=This Tesseract is a sender.
+chat.rfutilities:isReceiver.name=This Tesseract is a receiver.
 chat.rfutilities:hidden_true.name=This Tesseract is now invisible.
 chat.rfutilities:hidden_false.name=This Tesseract is now visible.
 chat.rfutilities:alreadyDialed.name=Those Tesseracts are already dialed!
-chat.rfutilities:otherDim.name=The Tesseracts need to be in the same dimension!
+chat.rfutilities:dialedTo.name=This tesseract is dialed to:
 
 guiDesc.rfutilities:accept.name=Accept
 guiDesc.rfutilities:decline.name=Decline

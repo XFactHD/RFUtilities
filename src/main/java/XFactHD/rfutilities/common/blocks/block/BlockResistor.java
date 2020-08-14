@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD>
+/*  Copyright (C) <2016>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,96 +17,90 @@ package XFactHD.rfutilities.common.blocks.block;
 
 import XFactHD.rfutilities.RFUtilities;
 import XFactHD.rfutilities.common.blocks.tileEntity.TileEntityResistor;
-import XFactHD.rfutilities.common.utils.LogHelper;
+import XFactHD.rfutilities.common.items.ItemMultimeter;
 import XFactHD.rfutilities.common.utils.Reference;
-import cofh.thermalexpansion.item.tool.ItemMultimeter;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
+import java.util.Arrays;
+
+@SuppressWarnings("deprecation")
 public class BlockResistor extends BlockBaseRFU
 {
+    public static PropertyDirection ORIENTATION = PropertyDirection.create("facing", Arrays.asList(EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH, EnumFacing.WEST));
+
     public BlockResistor()
     {
-        super("blockResistor", Material.iron, 1, ItemBlock.class, "");
-        //setCreativeTab(RFUtilities.creativeTab);
+        super("blockResistor", Material.IRON, "");
+        this.addItemBlock(new ItemBlock(this));
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack stack)
+    protected BlockStateContainer createBlockState()
     {
-        int l = MathHelper.floor_double((double) (entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-
-        if (l == 0)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 5, 2);
-        }
-
-        if (l == 1)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 2, 2);
-        }
-
-        if (l == 2)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 3, 2);
-        }
-
-        if (l == 3)
-        {
-            world.setBlockMetadataWithNotify(x, y, z, 4, 2);
-        }
+        return new BlockStateContainer(this, ORIENTATION);
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int meta, float hitX, float hitY, float hitZ)
+    public IBlockState getStateFromMeta(int meta)
     {
-        TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityResistor && RFUtilities.TE_LOADED && player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemMultimeter && !world.isRemote)
+        if (meta == 0 || meta == 1)
         {
-            player.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("desc.rfutilities:through.name") + " " + ((TileEntityResistor)te).throughput + " " + StatCollector.translateToLocal("desc.rfutilities:rftick.name")));
+            meta = EnumFacing.NORTH.getIndex();
+        }
+        return getDefaultState().withProperty(ORIENTATION, EnumFacing.getFront(meta));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state)
+    {
+        return state.getValue(ORIENTATION).getIndex();
+    }
+
+    @Override
+    public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+    {
+        return getDefaultState().withProperty(ORIENTATION, placer.getHorizontalFacing().getOpposite());
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+    {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof TileEntityResistor && heldItem != null && heldItem.getItem() instanceof ItemMultimeter && !world.isRemote)
+        {
+            player.addChatComponentMessage(new TextComponentString(I18n.format("desc.rfutilities:through.name") + " " + ((TileEntityResistor)te).getThroughput() + " RF/t"));
             return true;
         }
-        else
+        else if (!world.isRemote)
         {
-            if (!world.isRemote)
-            {
-                player.openGui(RFUtilities.instance, Reference.GUI_ID_RES, world, x, y, z);
-            }
-
+            player.openGui(RFUtilities.instance, Reference.GUI_ID_RES, world, pos.getX(), pos.getY(), pos.getZ());
         }
         return true;
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world, int meta)
+    public TileEntity createTileEntity(World world, IBlockState state)
     {
         return new TileEntityResistor();
     }
 
     @Override
-    public int getRenderType()
-    {
-        return -1;
-    }
-
-    @Override
-    public boolean isOpaqueCube()
-    {
-        return false;
-    }
-
-    @Override
-    public boolean renderAsNormalBlock()
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }

@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD>
+/*  Copyright (C) <2016>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@ public class Reference
 {
     public static final String MOD_ID = "rfutilities";
     public static final String MOD_NAME = "RFUtilities";
-    public static final String VERSION = "0.5-hotfix4";
+    public static final String VERSION = "1.10.2-0.3-hotfix1";
     public static final String SERVER_PROXY = "XFactHD.rfutilities.common.CommonProxy";
     public static final String CLIENT_PROXY = "XFactHD.rfutilities.client.ClientProxy";
-    public static final String DEPENDENCIES = "required-after:CoFHCore;" + "after:ThermalExpansion";
+    public static final String DEPENDENCIES = /*"after:ThermalExpansion;" +*/ "after:EnderIO;" + "required-after:substratum";
 
     public static final int GUI_ID_RES = 1;
 

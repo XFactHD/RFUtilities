@@ -1,4 +1,4 @@
-/*  Copyright (C) <2015>  <XFactHD, DrakoAlcarus>
+/*  Copyright (C) <2016>  <XFactHD>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,41 +15,31 @@
 
 package XFactHD.rfutilities.common.blocks.tileEntity;
 
-import cofh.api.energy.IEnergyHandler;
+import XFactHD.rfutilities.RFUtilities;
+import XFactHD.rfutilities.common.blocks.block.BlockTransistor;
+import XFactHD.rfutilities.common.utils.capability.forge.RFUEnergyHandlerTransistor;
+import XFactHD.rfutilities.common.utils.capability.tesla.RFUTeslaHandlerTransistor;
+import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
-import cpw.mods.fml.common.Optional;
-import li.cil.oc.api.machine.Arguments;
-import li.cil.oc.api.machine.Context;
-import li.cil.oc.api.network.ManagedPeripheral;
-import li.cil.oc.api.network.SidedComponent;
-import li.cil.oc.api.network.SimpleComponent;
+import net.darkhax.tesla.capability.TeslaCapabilities;
+import net.minecraft.block.*;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
 
-@Optional.InterfaceList
-        ({
-                @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "OpenComputers", striprefs = true),
-                @Optional.Interface(iface = "li.cil.oc.api.network.ManagedPeripheral", modid = "OpenComputers", striprefs = true),
-                @Optional.Interface(iface = "li.cil.oc.api.network.SidedComponent", modid = "OpenComputers", striprefs = true)
-        })
-public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyHandler, SimpleComponent, SidedComponent, ManagedPeripheral
+public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyReceiver, IEnergyProvider, ITickable
 {
+    private RFUTeslaHandlerTransistor teslaHandler = null;
+    private RFUEnergyHandlerTransistor energyHandler = null;
     private boolean isOn = false;
-    private String mode = "rs";
-    private String[] methods = new String[]{"setActive", "getActive", "setMode", "getMode"};
-
-    public boolean canConnectRedstone(ForgeDirection fd)
-    {
-        switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
-        {
-            case 2: return (fd == ForgeDirection.WEST);
-            case 3: return (fd == ForgeDirection.NORTH);
-            case 4: return (fd == ForgeDirection.EAST);
-            case 5: return (fd == ForgeDirection.SOUTH);
-            default: return false;
-        }
-    }
+    private int cooldown = 0;
+    private EnumFacing facing = null;
 
     public boolean getIsOn()
     {
@@ -58,137 +48,162 @@ public class TileEntityTransistor extends TileEntityBaseRFU implements IEnergyHa
 
     private void setIsOn(boolean on)
     {
-        isOn = on;
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        if (on != isOn && cooldown == 0)
+        {
+            isOn = on;
+            this.cooldown = 5;
+            worldObj.scheduleUpdate(pos, worldObj.getBlockState(pos).getBlock(), 0);
+            worldObj.markBlockRangeForRenderUpdate(pos, pos);
+        }
     }
 
-    private Object[] call(String method, Object argument)
+    private EnumFacing getFacing()
     {
-        if ("setActive".equals(method) && argument instanceof Boolean)
+        if (facing == null)
         {
-            setIsOn((Boolean)argument);
-            return new Object[]{null};
+            facing = getBlockState().getValue(BlockTransistor.ORIENTATION);
         }
-        else if ("getActive".equals(method))
-        {
-            return new Object[]{getIsOn()};
-        }
-        else if ("setMode".equals(method) && argument instanceof String && ("rs".equals(argument) || "oc".equals(argument)))
-        {
-            setMode((String)argument);
-            return new Object[]{null};
-        }
-        else if ("getMode".equals(method))
-        {
-            return new Object[]{getMode()};
-        }
-        return new Object[]{"Throw!"};
+        return facing;
     }
 
-    private void setMode(String mode)
+    public void setFacing(EnumFacing facing)
     {
-        this.mode = mode;
-    }
-
-    private String getMode()
-    {
-        return mode;
+        this.facing = facing;
     }
 
     @Override
-    public void updateEntity()
+    public void update()
     {
-        super.updateEntity();
-        boolean on = isOn;
-        boolean redstone = worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord);
-        if ("rs".equals(getMode()) && on != redstone)
+        if (cooldown > 0)
         {
-            setIsOn(redstone);
+            --this.cooldown;
         }
+        boolean redstone = getPowerOnSide(getFacing()) > 0;
+        setIsOn(redstone);
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    {
+        if (capability == CapabilityEnergy.ENERGY || (RFUtilities.TESLA_LOADED && (capability == TeslaCapabilities.CAPABILITY_PRODUCER || capability == TeslaCapabilities.CAPABILITY_CONSUMER)))
+        {
+            return canConnectEnergy(facing);
+        }
+        return super.hasCapability(capability, facing);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    {
+        if (capability == CapabilityEnergy.ENERGY && canConnectEnergy(facing))
+        {
+            return (T)energyHandler.setSendingSide(facing.getOpposite());
+        }
+        else if (RFUtilities.TESLA_LOADED && (capability == TeslaCapabilities.CAPABILITY_PRODUCER || capability == TeslaCapabilities.CAPABILITY_CONSUMER))
+        {
+            return (T)teslaHandler.setSendingSide(facing.getOpposite());
+        }
+        return super.getCapability(capability, facing);
     }
 
     //IEnergyHandler
     @Override
-    public boolean canConnectEnergy(ForgeDirection fd)
+    public boolean canConnectEnergy(EnumFacing facing)
     {
-        switch (worldObj.getBlockMetadata(xCoord, yCoord, zCoord))
+        switch (worldObj.getBlockState(pos).getValue(BlockTransistor.ORIENTATION).getIndex())
         {
-            case 2: return (fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH);
-            case 3: return (fd == ForgeDirection.EAST || fd == ForgeDirection.WEST);
-            case 4: return (fd == ForgeDirection.NORTH || fd == ForgeDirection.SOUTH);
-            case 5: return (fd == ForgeDirection.EAST || fd == ForgeDirection.WEST);
+            case 2: return (facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH);
+            case 3: return (facing == EnumFacing.EAST  || facing == EnumFacing.WEST);
+            case 4: return (facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH);
+            case 5: return (facing == EnumFacing.EAST  || facing == EnumFacing.WEST);
             default: return false;
         }
     }
 
     @Override
-    public int receiveEnergy(ForgeDirection fd, int amount, boolean simulate)
+    public int receiveEnergy(EnumFacing side, int amount, boolean simulate)
     {
-        ForgeDirection opposite = fd.getOpposite();
-        TileEntity te = worldObj.getTileEntity(xCoord + opposite.offsetX, yCoord, zCoord + opposite.offsetZ);
-        if (canConnectEnergy(fd) && te instanceof IEnergyReceiver && (((IEnergyReceiver)te).receiveEnergy(fd, amount, true) > 0) && isOn)
+        EnumFacing opposite = facing.getOpposite();
+        return transferEnergy(opposite, amount, simulate);
+    }
+
+    public int transferEnergy(EnumFacing side, int amount, boolean simulate)
+    {
+        TileEntity te = worldObj.getTileEntity(pos.offset(side));
+        if (!isOn || te == null) { return 0; }
+        if (te instanceof IEnergyReceiver && ((IEnergyReceiver)te).receiveEnergy(side.getOpposite(), amount, true) > 0)
         {
-            return ((IEnergyReceiver)te).receiveEnergy(fd, amount, simulate);
+            return ((IEnergyReceiver)te).receiveEnergy(side.getOpposite(), amount, simulate);
+        }
+        else if (RFUtilities.TESLA_LOADED && te.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side.getOpposite()) && te.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side.getOpposite()).givePower(amount, true) > 0)
+        {
+            return (int)te.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side.getOpposite()).givePower(amount, simulate);
+        }
+        else if (te.hasCapability(CapabilityEnergy.ENERGY, side.getOpposite()) && te.getCapability(CapabilityEnergy.ENERGY, side.getOpposite()).receiveEnergy(amount, true) > 0)
+        {
+            return te.getCapability(CapabilityEnergy.ENERGY, side.getOpposite()).receiveEnergy(amount, simulate);
+        }
+        return 0;
+    }
+
+    @Override
+    public int extractEnergy(EnumFacing facing, int amount, boolean simulate)
+    {
+        return 0;
+    }
+
+    @Override
+    public int getEnergyStored(EnumFacing facing)
+    {
+        return 0;
+    }
+
+    @Override
+    public int getMaxEnergyStored(EnumFacing facing)
+    {
+        return 0;
+    }
+
+    private int getPowerOnSide(EnumFacing side)
+    {
+        IBlockState state = worldObj.getBlockState(pos.offset(side.getOpposite()));
+        Block block = state.getBlock();
+        if (block == Blocks.REDSTONE_BLOCK)
+        {
+            return 15;
+        }
+        else if (block == Blocks.REDSTONE_WIRE)
+        {
+            return state.getValue(BlockRedstoneWire.POWER);
+        }
+        else if (block == Blocks.LEVER)
+        {
+            return state.getValue(BlockLever.POWERED) ? 15 : 0;
+        }
+        else if (block instanceof BlockPressurePlateWeighted)
+        {
+            return state.getValue(BlockPressurePlateWeighted.POWER) > 1 ? 15 : 0;
+        }
+        else if (block instanceof BlockPressurePlate)
+        {
+            return state.getValue(BlockPressurePlate.POWERED) ? 15 : 0;
         }
         else
         {
-            return 0;
+            return worldObj.getStrongPower(pos, side);
         }
     }
 
     @Override
-    public int extractEnergy(ForgeDirection fd, int amount, boolean simulate)
+    public void validate()
     {
-        return 0;
-    }
-
-    @Override
-    public int getEnergyStored(ForgeDirection fd)
-    {
-        return 0;
-    }
-
-    @Override
-    public int getMaxEnergyStored(ForgeDirection fd)
-    {
-        return 0;
-    }
-
-    //OpenComputers
-    @Optional.Method(modid = "OpenComputers")
-    @Override
-    public String getComponentName()
-    {
-        return "rfu_transistor";
-    }
-
-    @Override
-    public boolean canConnectNode(ForgeDirection fd)
-    {
-        return canConnectRedstone(fd);
-    }
-
-    @Optional.Method(modid = "OpenComputers")
-    @Override
-    public String[] methods()
-    {
-        return methods;
-    }
-
-    @Optional.Method(modid = "OpenComputers")
-    @Override
-    public Object[] invoke(String method, Context context, Arguments arguments) throws Exception
-    {
-        if (("setActive".equals(method) && arguments.count() == 1 && arguments.isBoolean(0)) || ("setMode".equals(method) && arguments.count() == 1 && arguments.isString(0)) || ("getActive".equals(method) && arguments.count() == 0) || ("getMode".equals(method) && arguments.count() == 0))
+        super.validate();
+        if (RFUtilities.TESLA_LOADED)
         {
-            Object[] result = call(method, arguments.checkAny(0));
-            if (result[0] != null && result[0].equals("Throw!"))
-            {
-                throw new NoSuchMethodException("Wrong argument!");
-            }
-            return result;
+            teslaHandler = new RFUTeslaHandlerTransistor(this);
         }
-        throw new NoSuchMethodException("Wrong argument!");
+        energyHandler = new RFUEnergyHandlerTransistor(this);
     }
 
     //NBT
