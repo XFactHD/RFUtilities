@@ -1,0 +1,30 @@
+modLoader="javafml"
+loaderVersion="[43,)"
+license="LGPL v3"
+issueTrackerURL="https://github.com/XFactHD/RFUtilities/issues"
+
+[[mods]]
+	modId="rfutilities"
+	version="${file.jarVersion}"
+	displayName="RFUtilities"
+	#updateJSONURL="https://change.me.example.invalid/updates.json"
+	displayURL="https://www.curseforge.com/minecraft/mc-mods/rf-utilities"
+	logoFile="logo.png"
+	#credits=""
+	authors="XFactHD"
+	description='''
+	'''
+
+[[dependencies.rfutilities]]
+    modId="forge"
+    mandatory=true
+    versionRange="[43,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.rfutilities]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.19.2,1.20)"
+    ordering="NONE"
+    side="BOTH"
