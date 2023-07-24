@@ -1,0 +1,6 @@
+{
+  "parent": "rfutilities:block/capacitor_template",
+  "textures": {
+    "type": "rfutilities:block/capacitor_enderio_double"
+  }
+}

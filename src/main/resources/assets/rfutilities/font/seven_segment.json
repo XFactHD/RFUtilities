@@ -1,0 +1,20 @@
+{
+    "providers": [
+        {
+            "type": "space",
+            "advances": {
+                "\u200c": 0
+            }
+        },
+        {
+            "type": "bitmap",
+            "file": "rfutilities:font/seven_segment.png",
+            "height": 8,
+            "ascent": 7,
+            "chars": [
+                "\u0030\u0031\u0032\u0033\u0034\u0035\u0036\u0037\u0038\u0039\u0000\u0000\u0000\u0000\u0000\u0000",
+                "\u0020\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+            ]
+        }
+    ]
+}

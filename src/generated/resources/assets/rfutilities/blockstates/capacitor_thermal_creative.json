@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "rfutilities:block/capacitor_thermal_creative",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "rfutilities:block/capacitor_thermal_creative",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "rfutilities:block/capacitor_thermal_creative"
+    },
+    "facing=west": {
+      "model": "rfutilities:block/capacitor_thermal_creative",
+      "y": 90
+    }
+  }
+}

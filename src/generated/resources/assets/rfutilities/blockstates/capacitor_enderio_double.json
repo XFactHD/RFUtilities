@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "rfutilities:block/capacitor_enderio_double",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "rfutilities:block/capacitor_enderio_double",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "rfutilities:block/capacitor_enderio_double"
+    },
+    "facing=west": {
+      "model": "rfutilities:block/capacitor_enderio_double",
+      "y": 90
+    }
+  }
+}
